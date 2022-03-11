@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "434498880452",
+    "project_id": "carserv-75c2e",
+    "storage_bucket": "carserv-75c2e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:434498880452:android:8bf6a867df7d7da6deda91",
+        "android_client_info": {
+          "package_name": "com.example.carserv"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "434498880452-b9jodm6q91hjehbtu1jtgfibb0p9n4to.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBrYVJsKc7X7sGlD-oB0f8w030-hxgNBn4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "434498880452-b9jodm6q91hjehbtu1jtgfibb0p9n4to.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
