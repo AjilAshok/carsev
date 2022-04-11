@@ -1,5 +1,6 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:carserv/contoller/controler.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_state_manager/src/simple/get_state.dart';
@@ -36,68 +37,89 @@ class Breakdownbike extends StatelessWidget {
            SizedBox(
             height: 30,
           ),
-          Expanded(
-            child: ListView.builder(
-              scrollDirection: Axis.vertical,
-              // physics: NeverScrollableScrollPhysics(),
-               
-              itemCount: 5,
-              itemBuilder: (context, index) {
-              
-              return InkWell(
-                onTap: (){
-                  Get.to(Bikebreakdownform());
-                },
-                child: Column(
-                  // crossAxisAlignment: CrossAxisAlignment.end,
-                  
-                  children: [
-                      Divider(
-                      thickness: 1,
-                      color: Colors.black,
-                    ),
+          StreamBuilder<QuerySnapshot>(
+            stream: FirebaseFirestore.instance
+                    .collection('Owner')
+                    .where("type", isEqualTo: 'Bike')
+                    .where("chekbox", arrayContains: "Brekdown")
+                    .snapshots(),
+            builder: (context,  AsyncSnapshot<QuerySnapshot> snapshot) {
+               if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  } else if (snapshot.data!.docs.isEmpty) {
+                    return Center(
+                      child: Text('No owners'),
+                    );
+                  }
+              return Expanded(
+                child: ListView.builder(
+                  scrollDirection: Axis.vertical,
+                  // physics: NeverScrollableScrollPhysics(),
                    
-                    Row(
+                  itemCount: snapshot.data!.docs.length,
+                  itemBuilder: (context, index) {
+                    final ownerdetails = snapshot.data!.docs[index];
+                    var location=ownerdetails['location'];
+                  
+                  return InkWell(
+                    onTap: (){
+                      Get.to(Bikebreakdownform());
+                    },
+                    child: Column(
+                      // crossAxisAlignment: CrossAxisAlignment.end,
+                      
                       children: [
-                        Container(
-                          margin: EdgeInsets.all(5),
-                          height: 150,
-                          width: MediaQuery.of(context).size.width/2,
-                          color: Colors.green,
-                          child: Image(image: AssetImage("assets/d8411be98a7cba0a897438d97ad7ba8e.jpg"),fit: BoxFit.cover,),
+                          Divider(
+                          thickness: 1,
+                          color: Colors.black,
                         ),
                        
-                        Container(
-                          width: MediaQuery.of(context).size.width*0.46,
-                          child: Text("Company  service Time Duration 30 Hourpick from your home and service",style: TextStyle(fontSize: 20),),
-                        )
+                        Row(
+                          children: [
+                            Container(
+                              margin: EdgeInsets.all(5),
+                              height: 150,
+                              width: MediaQuery.of(context).size.width/2,
+                              color: Colors.green,
+                              child: Image(image: AssetImage("assets/d8411be98a7cba0a897438d97ad7ba8e.jpg"),fit: BoxFit.cover,),
+                            ),
+                           
+                            Container(
+                              width: MediaQuery.of(context).size.width*0.46,
+                              child: Text("""Company  service Time Duration 30 Hourpick from your home and service
+                              $location""",style: TextStyle(fontSize: 20),),
+                            )
+                          ],
+                        ),
+                        //  Divider(
+                        //   thickness: 1,
+                        //   color: Colors.black,
+                        // ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Text(ownerdetails['showname'],style: TextStyle(fontSize:25,fontWeight: FontWeight.bold ),),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Text("Minimum Amount  ",style: TextStyle(fontSize: 15) ),
+                              Text("₹100",style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold) ),
+                          ],
+                        ),
+                           Divider(
+                          thickness: 1,
+                          color: Colors.black,
+                        ),
+                  
+                       
                       ],
                     ),
-                    //  Divider(
-                    //   thickness: 1,
-                    //   color: Colors.black,
-                    // ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Text("Krishna service",style: TextStyle(fontSize:25,fontWeight: FontWeight.bold ),),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Text("Minimum Amount  ",style: TextStyle(fontSize: 15) ),
-                          Text("₹100",style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold) ),
-                      ],
-                    ),
-                       Divider(
-                      thickness: 1,
-                      color: Colors.black,
-                    ),
-              
-                   
-                  ],
-                ),
+                  );
+                },),
               );
-            },),
+            }
           )
 
           ],

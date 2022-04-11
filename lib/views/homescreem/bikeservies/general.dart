@@ -1,5 +1,6 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:carserv/contoller/controler.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -38,79 +39,99 @@ class Generalservice extends StatelessWidget {
             SizedBox(
               height: 30,
             ),
-            Expanded(
-              child: ListView.builder(
-                scrollDirection: Axis.vertical,
-                // physics: NeverScrollableScrollPhysics(),
+            StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance.collection('Owner').where("type", isEqualTo: 'Bike')
+                    .where("chekbox", arrayContainsAny: ["Enginework","Oilchange"])
+                    .snapshots(),
+              builder: (context, AsyncSnapshot<QuerySnapshot> snapshot ) {
+                 if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  } else if (snapshot.data!.docs.isEmpty) {
+                    return Center(
+                      child: Text('No owners'),
+                    );
+                  }
+                return Expanded(
+                  child: ListView.builder(
+                    scrollDirection: Axis.vertical,
+                    // physics: NeverScrollableScrollPhysics(),
+            
+                    itemCount: snapshot.data!.docs.length,
+                    itemBuilder: (context, index) {
+                       final ownerdetails = snapshot.data!.docs[index];
+                       var location=ownerdetails['location'];
 
-                itemCount: 5,
-                itemBuilder: (context, index) {
-                  return InkWell(
-                    onTap: () {
-                      Get.to(Generalform());
-                    },
-                    child: Column(
-                      // crossAxisAlignment: CrossAxisAlignment.end,
-
-                      children: [
-                        Divider(
-                          thickness: 1,
-                          color: Colors.black,
-                        ),
-
-                        Row(
+                      return InkWell(
+                        onTap: () {
+                          Get.to(Generalform());
+                        },
+                        child: Column(
+                          // crossAxisAlignment: CrossAxisAlignment.end,
+            
                           children: [
-                            Container(
-                              margin: EdgeInsets.all(5),
-                              height: 150,
-                              width: MediaQuery.of(context).size.width / 2,
-                              color: Colors.green,
-                              child: Image(
-                                image: AssetImage(
-                                    "assets/motorcycle-parts-garage-kitchen-blurry_151013-34169.webp"),
-                                fit: BoxFit.cover,
-                              ),
+                            Divider(
+                              thickness: 1,
+                              color: Colors.black,
                             ),
-                            Container(
-                              width: MediaQuery.of(context).size.width * 0.46,
-                              child: Text(
-                                "Company  service Time Duration 30 Hourpick from you and service",
-                                style: TextStyle(fontSize: 20),
-                              ),
-                            )
+            
+                            Row(
+                              children: [
+                                Container(
+                                  margin: EdgeInsets.all(5),
+                                  height: 150,
+                                  width: MediaQuery.of(context).size.width / 2,
+                                  color: Colors.green,
+                                  child: Image(
+                                    image: AssetImage(
+                                        "assets/motorcycle-parts-garage-kitchen-blurry_151013-34169.webp"),
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                                Container(
+                                  width: MediaQuery.of(context).size.width * 0.46,
+                                  child: Text(
+                                    """Company  service Time Duration 30 Hourpick from you and service
+                                    $location""",
+                                    style: TextStyle(fontSize: 20),
+                                  ),
+                                )
+                              ],
+                            ),
+                            //  Divider(
+                            //   thickness: 1,
+                            //   color: Colors.black,
+                            // ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            Text(
+                              ownerdetails['showname'],
+                              style: TextStyle(
+                                  fontSize: 25, fontWeight: FontWeight.bold),
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Text("Minimum Amount  ",
+                                    style: TextStyle(fontSize: 15)),
+                                Text("₹100",
+                                    style: TextStyle(
+                                        fontSize: 20, fontWeight: FontWeight.bold)),
+                              ],
+                            ),
+                            Divider(
+                              thickness: 1,
+                              color: Colors.black,
+                            ),
                           ],
                         ),
-                        //  Divider(
-                        //   thickness: 1,
-                        //   color: Colors.black,
-                        // ),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        Text(
-                          "Krishna service",
-                          style: TextStyle(
-                              fontSize: 25, fontWeight: FontWeight.bold),
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Text("Minimum Amount  ",
-                                style: TextStyle(fontSize: 15)),
-                            Text("₹100",
-                                style: TextStyle(
-                                    fontSize: 20, fontWeight: FontWeight.bold)),
-                          ],
-                        ),
-                        Divider(
-                          thickness: 1,
-                          color: Colors.black,
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
+                      );
+                    },
+                  ),
+                );
+              }
             )
           ],
         ),

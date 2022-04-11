@@ -6,6 +6,7 @@ import 'package:carserv/views/bootomnav/home.dart';
 
 import 'package:carserv/views/login.dart';
 import 'package:carserv/views/register.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
@@ -14,10 +15,11 @@ import 'package:page_transition/page_transition.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class Splashscreen extends StatelessWidget {
-  const Splashscreen({Key? key}) : super(key: key);
+  const   Splashscreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+     final auth = FirebaseAuth.instance.currentUser;
     Get.put(Servicecontroller());
 
     return AnimatedSplashScreen(
@@ -43,9 +45,13 @@ class Splashscreen extends StatelessWidget {
               style: GoogleFonts.rye(fontSize: 30, color: Colors.white))
         ],
       ),
-      nextScreen: 
-      // Homescreen(),
-      Loginpage(),
+      nextScreen:
+      auth ==null ? Loginpage(): 
+      // Registeraion(),
+      // Registeraion(),
+
+      Homescreen(),
+      // Loginpage(),
       duration: 3000,
       splashTransition: SplashTransition.rotationTransition,
       pageTransitionType: PageTransitionType.rightToLeftWithFade,

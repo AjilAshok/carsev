@@ -1,5 +1,8 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
@@ -9,22 +12,30 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class Servicecontroller extends GetxController {
   String? value;
+  String? brekdownmodel;
   String? value1;
   String? valueoil;
   String? valueoil1;
   String? valueengine;
   String? valueengine1;
+  String? valuemodel;
+  String? valueyearoil;
   String? genarall;
   String? genalralyear;
   String? bikebrekdown;
   String? bikebrekdown1;
+  var amount;
+  var sparechanged;
   RxDouble latitude = 0.0.obs;
-  RxDouble longitude = 0.0.obs;
+  var longitude = 0.0.obs;
   var address = ''.obs;
   late StreamSubscription<Position> streamSubscription;
-  final Set<Marker> markers = {};
+  Set<Marker> markers = {};
+  String valid = 'Select a option';
+  Color color = Colors.white;
 
   int currenindex = 0;
+
   bottomnavbar(index) {
     currenindex = index;
     update();
@@ -37,6 +48,11 @@ class Servicecontroller extends GetxController {
 
   drowpdown1(Value1) {
     value1 = Value1;
+    update();
+  }
+
+  drowpdown2(Value1) {
+    brekdownmodel = Value1;
     update();
   }
 
@@ -57,6 +73,16 @@ class Servicecontroller extends GetxController {
 
   Enginedromdown1(Valueeng1) {
     valueengine1 = Valueeng1;
+    update();
+  }
+
+  engienmodel(Valueeng1) {
+    valuemodel = Valueeng1;
+    update();
+  }
+
+  oilchagnge(Valuees) {
+    valueyearoil = Valuees;
     update();
   }
 
@@ -125,17 +151,34 @@ class Servicecontroller extends GetxController {
     address.value = '${place.locality},${place.country}';
   }
 
-  map() {
+  map({required lat,required long} ) {
     markers.add(Marker(
-      
-      markerId: MarkerId("id-1"),
-      position: LatLng(latitude.value,longitude.value),
-       infoWindow: InfoWindow(
-      title:address.value
-      )
-      
-    ));
-  }
+        markerId: MarkerId("id-1"),
+        position: LatLng(latitude.value, longitude.value),
+        infoWindow: InfoWindow(title: address.value)));
+        markers.add(Marker(
+        markerId: MarkerId("id-2"),
+        position: LatLng(lat,long),
+        infoWindow: InfoWindow(title: "Owner")));
+      //   print("**********************");
+      //  print(lat);
+      //  update();
 
+  }
+  // Marker  user=Marker(markerId: MarkerId("id-1"),
+  //   position: LatLng(76.3327488,10.0075243),
+  //       infoWindow: InfoWindow(title:"")
+  //       );
+        
+  
+  
+  
+ 
+
+  formvalide(String text, Color clr) {
+    valid = text;
+    color = clr;
+    update();
+  }
   
 }

@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:carserv/views/bootomnav/home.dart';
+import 'package:carserv/views/register.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -150,10 +151,12 @@ void veriyingnumber() {
 
 class Verification extends StatelessWidget {
    Verification({Key? key,}) : super(key: key);
+   Stream<User?> user=FirebaseAuth.instance.authStateChanges();
   
 
   @override
   Widget build(BuildContext context) {
+    print(user);
     return SafeArea(
         child: Scaffold(
       backgroundColor: Color(0XFF3D433E),
@@ -187,6 +190,8 @@ class Verification extends StatelessWidget {
               margin: EdgeInsets.only(top: 10),
               padding: EdgeInsets.all(50),
               child: PinFieldAutoFill(
+              decoration:UnderlineDecoration( textStyle: TextStyle(fontSize: 20, color: Colors.green),
+              colorBuilder: FixedColorBuilder(Colors.black) ),
                 controller: otpInput,
                 codeLength: 6,
               ),
@@ -201,6 +206,14 @@ class Verification extends StatelessWidget {
                           MaterialStateProperty.all(Color(0XFF62A769))),
                   onPressed: () {
                     verificycode(context);
+                    if (user==null) {
+                       Registeraion();
+                      
+                    }else{
+                      Homescreen();
+                    }
+                  
+                  
                 //  await   Navigator.pushReplacement(
                 //         context,
                 //         MaterialPageRoute(
@@ -235,26 +248,5 @@ class Verification extends StatelessWidget {
       ),
     ));
   }
-  void showMessage(String errorMessage,ctx) {
-    showDialog(
-        context: ctx,
-        builder: (BuildContext builderContext) {
-          return AlertDialog(
-            title: Text("Error"),
-            content: Text(errorMessage),
-            actions: [
-              TextButton(
-                child: Text("Ok"),
-                onPressed: () async {
-                  Navigator.of(builderContext).pop();
-                },
-              )
-            ],
-          );
-        });
-     
-    print("Invalid otp");
-
-
-   }
+  
 }

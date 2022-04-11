@@ -48,7 +48,22 @@ dependencies:
   geocoding: ^2.0.2
   sms_autofill: ^2.2.0
   lottie: ^1.2.2
-
+  firebase_storage: ^10.2.9
+  firebase_database: ^9.0.6
+  cloud_firestore: ^3.1.8
+  firebase_database_web: ^0.2.0+7
+  intl: ^0.17.0
+  
+  http: ^0.13.4
+  razorpay_flutter: ^1.2.9
+  oktoast: ^3.1.5
+  # syncfusion_flutter_pdf: ^20.1.47-beta.1
+  path_provider: ^2.0.9
+  open_file: ^3.2.1
+  firebase_messaging: ^11.2.12
+  native_notify: ^0.0.12
+  pdf: ^3.7.3
+ 
 dev_dependencies:
   flutter_test:
     sdk: flutter
