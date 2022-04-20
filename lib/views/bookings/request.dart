@@ -138,8 +138,8 @@ class Secondpage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print("************************");
-    print(currenuserid);
+    // print("************************");
+    // print(currenuserid);
     return Scaffold(
       backgroundColor: Color(0xFF3D433E),
       body: Accepted(),
@@ -152,6 +152,7 @@ class Secondpage extends StatelessWidget {
       stream:  FirebaseFirestore.instance.collection('Accepted').where('currentuserid',isEqualTo:currenuserid ).snapshots(),
       builder: (context,AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.connectionState==ConnectionState.waiting) {
+          // print(currenuserid);
           return Center(
             child: CircularProgressIndicator(),
           );
@@ -169,10 +170,13 @@ class Secondpage extends StatelessWidget {
   }
 // acceptedlistviewbuilder=======================
   ListView accpetedlistview(AsyncSnapshot<QuerySnapshot<Object?>> snapshot) {
+    // print(currenuserid);
     return ListView.builder(
         itemCount: snapshot.data!.docs.length,
         itemBuilder: (context, index) {
           final details=snapshot.data!.docs[index];
+          print( details.id,);
+
         
           return Padding(
             padding: const EdgeInsets.only(left: 10,right: 10),
@@ -181,7 +185,7 @@ class Secondpage extends StatelessWidget {
               children: [
                 Row(children: [
                   Text(
-                    details['ownername'],
+                    details['works'],
                     style: TextStyle(color: clr, fontSize: 20),
                   ),
                   SizedBox(
@@ -203,7 +207,7 @@ class Secondpage extends StatelessWidget {
                                   MaterialStateProperty.all(Color(0XFF62A769))),
                           onPressed: () {
                          
-                           Get.to(()=>Trackmap(index: index,latitude: details['ownerlatitde'],longitude: details['ownerlongitude'],ownername: details['ownername'],shopname: details['shopname'] ,work:details['works'] ,complaint:details['complaint'] ,curretuserid:currenuserid,));
+                           Get.to(Trackmap(username: details['nameuser'],index: index,latitude: details['ownerlatitde'],longitude: details['ownerlongitude'],ownername: details['ownername'],shopname: details['shopname'] ,work:details['works'] ,complaint:details['complaint'] ,curretuserid:currenuserid,ownerid: details['ownerid'],docid: details.id,) );
                           },
                           child: Text(
                             "Track",
@@ -234,7 +238,7 @@ class Thirdpage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(currenuserid);
+    // print(currenuserid);
     return Scaffold(
       backgroundColor: Color(0xFF3D433E),
       body: Experied(),
@@ -245,7 +249,7 @@ class Thirdpage extends StatelessWidget {
   StreamBuilder<QuerySnapshot<Object?>> Experied() {
     return StreamBuilder<QuerySnapshot>(
       stream:FirebaseFirestore.instance
-                .collection('Rejected').where("currenuserid",isEqualTo:currenuserid ).snapshots(), 
+                .collection('Rejected').where("currentuserid",isEqualTo:currenuserid ).snapshots(), 
      
           builder: (context,AsyncSnapshot<QuerySnapshot> snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
@@ -267,6 +271,7 @@ class Thirdpage extends StatelessWidget {
         itemCount: snapshot.data!.docs.length,
         itemBuilder: (context, index) {
           final shopdetails=snapshot.data!.docs[index];
+        
           return Padding(
             padding: const EdgeInsets.all(10.0),
             child: Column(

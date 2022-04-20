@@ -164,6 +164,17 @@ class Generalform extends StatelessWidget {
     "item 7",
     "item 8"
   ];
+ final generworksmodel=[
+    "model 1",
+    "model 2",
+    "model 3",
+    "model 4",
+    "model 5",
+    "model 6",
+    "model 7",
+    "model 8"
+
+ ];
   final bikeyears = [
     "2010",
     "2011",
@@ -178,9 +189,12 @@ class Generalform extends StatelessWidget {
     "2020",
     "2021"
   ];
+  TextEditingController generalwork=TextEditingController();
+  final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
+    generalwork.text="General work";
     return SafeArea(
       child: Scaffold(
         backgroundColor: Colors.black,
@@ -193,208 +207,262 @@ class Generalform extends StatelessWidget {
           ),
         ),
         body: SingleChildScrollView(
-          child: Column(
-            children: [
-              Container(
-                height: MediaQuery.of(context).size.height * 0.25,
-                width: double.maxFinite,
-                color: Color(0XFF738878),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "| Don’t worry we are help you.",
-                        style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold),
-                      ),
-                      // SizedBox(
-                      //   height: 70,
-                      // ),
-                      Row(
-                        children: [
-                          Text("Generalwork form",
-                              style: GoogleFonts.rokkitt(
-                                  color: Color(0XFF72E77E), fontSize: 25)),
-                          SizedBox(
-                            width: 30,
-                          ),
-                          Container(
-                            height: 140,
-                            width: 150,
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(15),
-                                image: DecorationImage(
-                                    image: AssetImage(
-                                        "assets/ac5dd9fe4afdc1c69bc0f1f7edaa4713.jpg"),
-                                    fit: BoxFit.fill)),
-                          )
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(
-                    top: 50, left: 50, right: 50, bottom: 10),
-                child: TextFormField(
-                  style: TextStyle(color: Colors.white),
-                  decoration: InputDecoration(
-                    hintText: "GeneralWork",
-                    hintStyle: TextStyle(color: Colors.white),
-                    enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(12.0)),
-                        borderSide:
-                            BorderSide(color: Color(0xFF008000), width: 1)),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                      borderSide: BorderSide(color: Color(0xFF008000)),
-                    ),
-                  ),
-                ),
-              ),
-              GetBuilder<Servicecontroller>(
-                builder: (controller) => Padding(
-                  padding:
-                      EdgeInsets.only(top: 0, left: 50, right: 50, bottom: 10),
-                  child: Theme(
-                    data: Theme.of(context).copyWith(
-                      canvasColor: Colors.black,
-                    ),
-                    child: Container(
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(12.0)),
-                          border: Border.all(color: Color(0xFF008000))),
-                      child: DropdownButtonHideUnderline(
-                        child: DropdownButton(
-                            hint: Text(
-                              "Manufacture",
-                              style: TextStyle(color: Colors.white),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                Container(
+                  height: MediaQuery.of(context).size.height * 0.25,
+                  width: double.maxFinite,
+                  color: Color(0XFF738878),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "| Don’t worry we are help you.",
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        // SizedBox(
+                        //   height: 70,
+                        // ),
+                        Row(
+                          children: [
+                            Text("Generalwork form",
+                                style: GoogleFonts.rokkitt(
+                                    color: Color(0XFF72E77E), fontSize: 25)),
+                            SizedBox(
+                              width: 30,
                             ),
-                            isExpanded: true,
-                            iconEnabledColor: Color(0xFF008000),
-                            value: controller.genarall,
-                            items: generalitems.map(buildmenu).toList(),
-                            onChanged: (value) {
-                              controller.bikegenera(value);
-                            }),
+                            Container(
+                              height: 140,
+                              width: 150,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(15),
+                                  image: DecorationImage(
+                                      image: AssetImage(
+                                          "assets/ac5dd9fe4afdc1c69bc0f1f7edaa4713.jpg"),
+                                      fit: BoxFit.fill)),
+                            )
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(
+                      top: 50, left: 50, right: 50, bottom: 10),
+                  child: TextFormField(
+                    controller: generalwork,
+                    style: TextStyle(color: Colors.white),
+                    decoration: InputDecoration(
+                      hintText: "GeneralWork",
+                      hintStyle: TextStyle(color: Colors.white),
+                      enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(12.0)),
+                          borderSide:
+                              BorderSide(color: Color(0xFF008000), width: 1)),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                        borderSide: BorderSide(color: Color(0xFF008000)),
                       ),
                     ),
                   ),
                 ),
-              ),
-              GetBuilder<Servicecontroller>(
-                builder: (controller) => Padding(
-                  padding:
-                      EdgeInsets.only(top: 0, left: 50, right: 50, bottom: 10),
-                  child: Theme(
-                    data: Theme.of(context).copyWith(
-                      canvasColor: Colors.black,
-                    ),
-                    child: Container(
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(12.0)),
-                          border: Border.all(color: Color(0xFF008000))),
-                      child: DropdownButtonHideUnderline(
-                        child: DropdownButton(
-                            hint: Text(
-                              "Model",
-                              style: TextStyle(color: Colors.white),
+                GetBuilder<Servicecontroller>(
+                  builder: (controller) => Padding(
+                    padding:
+                        EdgeInsets.only(top: 0, left: 50, right: 50, bottom: 10),
+                    child: Theme(
+                      data: Theme.of(context).copyWith(
+                        canvasColor: Colors.black,
+                      ),
+                      child: Container(
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.all(Radius.circular(12.0)),
+                            border: Border.all(color: Color(0xFF008000))),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButtonFormField(
+                            decoration: InputDecoration(
+                            border: InputBorder.none
                             ),
-                            isExpanded: true,
-                            iconEnabledColor: Color(0xFF008000),
-                            value: controller.genarall,
-                            items: generalitems.map(buildmenu).toList(),
-                            onChanged: (value) {
-                              controller.bikegenera(value);
+                            validator: ((value) {
+                              if (value==null) {
+                                return "Select a field";
+                                
+                              }
                             }),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              GetBuilder<Servicecontroller>(
-                builder: (controller) => Padding(
-                  padding:
-                      EdgeInsets.only(top: 0, left: 50, right: 50, bottom: 10),
-                  child: Theme(
-                    data: Theme.of(context).copyWith(
-                      canvasColor: Colors.black,
-                    ),
-                    child: Container(
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(12.0)),
-                          border: Border.all(color: Color(0xFF008000))),
-                      child: DropdownButtonHideUnderline(
-                        child: DropdownButton(
-                          hint: Text(
-                            "Year",
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          isExpanded: true,
-                          iconEnabledColor: Color(0xFF008000),
-                          value: controller.genalralyear,
-                          // items: years.map(buildmenu).toList(),
-                          onChanged: (value) {
-                            controller.bikegenerayea(value);
-                          },
-                          items: bikeyears.map((String value) {
-                            return DropdownMenuItem(
-                                value: value,
-                                child: Text(value,
-                                    style: TextStyle(
-                                        color: Color.fromARGB(
-                                            255, 250, 250, 250))));
-                          }).toList(),
+                              hint: Padding(
+                                padding: const EdgeInsets.only(left: 10),
+                                child: Text(
+                                  "Manufacture",
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                              ),
+                              isExpanded: true,
+                              iconEnabledColor: Color(0xFF008000),
+                              value: controller.genarall,
+                              items: generalitems.map(buildmenu).toList(),
+                              onChanged: (value) {
+                                controller.bikegenera(value);
+                              }),
                         ),
                       ),
                     ),
                   ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(
-                    top: 0, left: 50, right: 50, bottom: 10),
-                child: TextFormField(
-                  style: TextStyle(color: Colors.white),
-                  decoration: const InputDecoration(
-                    hintText: "Issue message",
-                    hintStyle: TextStyle(color: Colors.white),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                      borderSide: BorderSide(color: Color(0xFF008000)),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(12.0)),
-                      borderSide:
-                          BorderSide(color: Color(0xFF008000), width: 1),
+                GetBuilder<Servicecontroller>(
+                  builder: (controller) => Padding(
+                    padding:
+                        EdgeInsets.only(top: 0, left: 50, right: 50, bottom: 10),
+                    child: Theme(
+                      data: Theme.of(context).copyWith(
+                        canvasColor: Colors.black,
+                      ),
+                      child: Container(
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.all(Radius.circular(12.0)),
+                            border: Border.all(color: Color(0xFF008000))),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButtonFormField(
+                             decoration: InputDecoration(
+                            border: InputBorder.none
+                            ),
+                               validator: ((value) {
+                              if (value==null) {
+                                return "Select a field";
+                                
+                              }
+                            }),
+                              hint: Padding(
+                                padding: const EdgeInsets.only(left: 10),
+                                child: Text(
+                                  "Model",
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                              ),
+                              isExpanded: true,
+                              iconEnabledColor: Color(0xFF008000),
+                              value: controller.generalmodel,
+                              items: generworksmodel.map(buildmenu).toList(),
+                              onChanged: (value) {
+                                controller.generialmodel(value);
+                              }),
+                        ),
+                      ),
                     ),
                   ),
                 ),
-              ),
-              SizedBox(
-                height: 50,
-              ),
-              Container(
-                 width: 180,
-                height: 50,
-                child: ElevatedButton(
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(Color(0xFF62A769)),
-                  ),
-                  onPressed: () {},
-                  child: Text(
-                    "Continue",
-                    style: TextStyle(
-                        color: Colors.black, fontSize: 20, letterSpacing: 1),
+                GetBuilder<Servicecontroller>(
+                  builder: (controller) => Padding(
+                    padding:
+                        EdgeInsets.only(top: 0, left: 50, right: 50, bottom: 10),
+                    child: Theme(
+                      data: Theme.of(context).copyWith(
+                        canvasColor: Colors.black,
+                      ),
+                      child: Container(
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.all(Radius.circular(12.0)),
+                            border: Border.all(color: Color(0xFF008000))),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButtonFormField(
+                             decoration: InputDecoration(
+                            border: InputBorder.none
+                            ),
+                              validator: ((value) {
+                              if (value==null) {
+                                return "Select a field";
+                                
+                              }
+                            }),
+                            
+                            hint: Padding(
+                              padding: const EdgeInsets.only(left: 10),
+                              child: Text(
+                                "Year",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ),
+                            isExpanded: true,
+                            iconEnabledColor: Color(0xFF008000),
+                            value: controller.genalralyear,
+                            // items: years.map(buildmenu).toList(),
+                            onChanged: (value) {
+                              controller.bikegenerayea(value);
+                            },
+                            items: bikeyears.map((String value) {
+                              return DropdownMenuItem(
+                                  value: value,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(left: 10),
+                                    child: Text(value,
+                                        style: TextStyle(
+                                            color: Color.fromARGB(
+                                                255, 250, 250, 250))),
+                                  ));
+                            }).toList(),
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
                 ),
-              )
-            ],
+                Padding(
+                  padding: const EdgeInsets.only(
+                      top: 0, left: 50, right: 50, bottom: 10),
+                  child: TextFormField(
+                      validator: ((value) {
+                              if (value==null||value.isEmpty) {
+                                return "Enter some text";
+                                
+                              }
+                            }),
+                    style: TextStyle(color: Colors.white),
+                    decoration: const InputDecoration(
+                      hintText: "Issue message",
+                      hintStyle: TextStyle(color: Colors.white),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                        borderSide: BorderSide(color: Color(0xFF008000)),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(12.0)),
+                        borderSide:
+                            BorderSide(color: Color(0xFF008000), width: 1),
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 50,
+                ),
+                Container(
+                   width: 180,
+                  height: 50,
+                  child: ElevatedButton(
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(Color(0xFF62A769)),
+                    ),
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        
+                      }
+                    },
+                    child: Text(
+                      "Continue",
+                      style: TextStyle(
+                          color: Colors.black, fontSize: 20, letterSpacing: 1),
+                    ),
+                  ),
+                )
+              ],
+            ),
           ),
         ),
       ),
@@ -402,8 +470,11 @@ class Generalform extends StatelessWidget {
   }
     DropdownMenuItem<String> buildmenu(String item) => DropdownMenuItem(
       value: item,
-      child: Text(
-        item,
-        style: TextStyle(color: Color.fromARGB(255, 250, 250, 250)),
+      child: Padding(
+        padding: const EdgeInsets.only(left: 10),
+        child: Text(
+          item,
+          style: TextStyle(color: Color.fromARGB(255, 250, 250, 250)),
+        ),
       ));
 }

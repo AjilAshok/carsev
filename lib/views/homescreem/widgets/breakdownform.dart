@@ -6,6 +6,7 @@ import 'package:get/get_state_manager/src/simple/get_state.dart';
 import 'package:get/instance_manager.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:native_notify/native_notify.dart';
 
 class Breakdownform extends StatelessWidget {
   Breakdownform(
@@ -20,6 +21,7 @@ class Breakdownform extends StatelessWidget {
   var shopname;
   var location;
   final currentuserid = FirebaseAuth.instance.currentUser!.uid;
+      var name = '';
 
   final itesm = [
     "item 1",
@@ -161,9 +163,18 @@ class Breakdownform extends StatelessWidget {
                                 BorderRadius.all(Radius.circular(12.0)),
                             border: Border.all(color: Color(0xFF008000))),
                         child: DropdownButtonHideUnderline(
-                          child: DropdownButton(
+                          child: DropdownButtonFormField(
+                              decoration: InputDecoration(
+                            border: InputBorder.none
+                          ),
+                              validator: (values){
+                              if (values==null) {
+                                return "Select a option";
+                                
+                              }
+                            },
                               hint: Padding(
-                                padding: const EdgeInsets.all(8.0),
+                                padding: const EdgeInsets.only(left: 10),
                                 child: Text(
                                   "Manufacture",
                                   style: TextStyle(color: Colors.white),
@@ -195,9 +206,19 @@ class Breakdownform extends StatelessWidget {
                                 BorderRadius.all(Radius.circular(12.0)),
                             border: Border.all(color: Color(0xFF008000))),
                         child: DropdownButtonHideUnderline(
-                          child: DropdownButton(
+
+                          child: DropdownButtonFormField(
+                              decoration: InputDecoration(
+                            border: InputBorder.none
+                          ),
+                              validator: (values){
+                              if (values==null) {
+                                return "Select a option";
+                                
+                              }
+                            },
                               hint: Padding(
-                                padding: const EdgeInsets.all(8.0),
+                                padding: const EdgeInsets.only(left: 10),
                                 child: Text(
                                   "Model",
                                   style: TextStyle(color: Colors.white),
@@ -229,9 +250,18 @@ class Breakdownform extends StatelessWidget {
                                 BorderRadius.all(Radius.circular(12.0)),
                             border: Border.all(color: Color(0xFF008000))),
                         child: DropdownButtonHideUnderline(
-                          child: DropdownButton(
+                          child: DropdownButtonFormField(
+                              decoration: InputDecoration(
+                            border: InputBorder.none
+                          ),
+                            validator: (values){
+                              if (values==null) {
+                                return "Select a option";
+                                
+                              }
+                            },
                             hint: Padding(
-                              padding: const EdgeInsets.all(8.0),
+                              padding: const EdgeInsets.only(left: 10),
                               child: Text(
                                 "Year",
                                 style: TextStyle(color: Colors.white),
@@ -248,7 +278,7 @@ class Breakdownform extends StatelessWidget {
                               return DropdownMenuItem(
                                   value: value,
                                   child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
+                                    padding: const EdgeInsets.only(left: 10),
                                     child: Text(value,
                                         style: TextStyle(
                                             color: Color.fromARGB(
@@ -287,14 +317,14 @@ class Breakdownform extends StatelessWidget {
                     ),
                   ),
                 ),
-                Padding(
-                  padding: EdgeInsets.all(8),
-                  child: GetBuilder<Servicecontroller>(
-                      builder: (controller) => Text(
-                            controller.valid.toString(),
-                            style: TextStyle(color: controller.color),
-                          )),
-                ),
+                // Padding(
+                //   padding: EdgeInsets.all(8),
+                //   child: GetBuilder<Servicecontroller>(
+                //       builder: (controller) => Text(
+                //             controller.valid.toString(),
+                //             style: TextStyle(color: controller.color),
+                //           )),
+                // ),
                 SizedBox(
                   height: 50,
                 ),
@@ -308,17 +338,11 @@ class Breakdownform extends StatelessWidget {
                     ),
                     onPressed: () async {
                       final contorler = Get.put(Servicecontroller());
-                      if (contorler.value == null) {
-                        contorler.formvalide("Select a option", Colors.red);
-                      }
-                      if (contorler.brekdownmodel == null) {
-                        contorler.formvalide("Select a option", Colors.red);
-                      }
-                      if (contorler.value1 == null) {
-                        contorler.formvalide("Select a option", Colors.red);
-                      }
+                     
                       if (_formKey.currentState!.validate()) {
+                        yourIndiePushSendingFunction();
                         await breakdownform();
+                        Navigator.pop(context);
                       }
                     },
                     child: Text(
@@ -339,7 +363,7 @@ class Breakdownform extends StatelessWidget {
   DropdownMenuItem<String> buildmenu(String item) => DropdownMenuItem(
       value: item,
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.only(left: 10),
         child: Text(
           item,
           style: TextStyle(color: Color.fromARGB(255, 250, 250, 250)),
@@ -348,7 +372,7 @@ class Breakdownform extends StatelessWidget {
   breakdownform() async {
     bool expire = false;
 
-    var name = '';
+
     var user = FirebaseAuth.instance.currentUser;
     var collection = FirebaseFirestore.instance.collection('Users');
     var docSnapshot = await collection.doc(user!.uid).get();
@@ -378,8 +402,14 @@ class Breakdownform extends StatelessWidget {
       "experied": expire,
       "currenuserid": currentuserid,
       "latitude": controller.latitude.value,
-      " logitude": controller.longitude.value,
-       "date":DateFormat('dd-MM-yyyy').format(DateTime.now())
+      "logitude": controller.longitude.value,
+      "date":DateFormat('dd-MM-yyyy').format(DateTime.now())
     }).then((value) => print("userbreakdownform"));
   }
+  void yourIndiePushSendingFunction() {
+    
+    NativeNotify.sendIndieNotification(472, 'qMMR6PMv5Lfht6dCRrmQzA', '4', 'You have new request', '$name', null, null);
+    // yourAppID, yourAppToken, 'your_sub_id', 'your_title', 'your_body' is required
+    // put null in any other parameter you do NOT want to use
+}
 }

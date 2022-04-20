@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/instance_manager.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:native_notify/native_notify.dart';
 
 class Carwashform extends StatelessWidget {
   Carwashform(
@@ -176,6 +177,7 @@ class Carwashform extends StatelessWidget {
                     onPressed: () async {
                       print('press');
                       if (_formKey.currentState!.validate()) {
+                        yourIndiePushSendingFunction();
                         carwashform();
                       }
                     },
@@ -226,7 +228,13 @@ class Carwashform extends StatelessWidget {
       "currenuserid": currentuserid,
       "latitude":controler.latitude.value,
       "logitude":controler.longitude.value,
-       "date":DateFormat('dd-MM-yyyy').format(DateTime.now())
+      "date":DateFormat('dd-MM-yyyy').format(DateTime.now())
     }).then((value) => print("carwashform"));
   }
+  void yourIndiePushSendingFunction() {
+    
+    NativeNotify.sendIndieNotification(472, 'qMMR6PMv5Lfht6dCRrmQzA', '4', 'You have new request', '$name', null, null);
+    // yourAppID, yourAppToken, 'your_sub_id', 'your_title', 'your_body' is required
+    // put null in any other parameter you do NOT want to use
+}
 }

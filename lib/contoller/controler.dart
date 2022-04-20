@@ -24,15 +24,17 @@ class Servicecontroller extends GetxController {
   String? genalralyear;
   String? bikebrekdown;
   String? bikebrekdown1;
-  var amount;
-  var sparechanged;
+  String? bikebreakdownmode;
+  String? generalmodel;
+  // var amount;
+  // var sparechanged;
   RxDouble latitude = 0.0.obs;
   var longitude = 0.0.obs;
   var address = ''.obs;
   late StreamSubscription<Position> streamSubscription;
   Set<Marker> markers = {};
-  String valid = 'Select a option';
-  Color color = Colors.white;
+  // String valid = 'Select a option';
+  // Color color = Colors.white;
 
   int currenindex = 0;
 
@@ -107,6 +109,18 @@ class Servicecontroller extends GetxController {
     bikebrekdown1 = bikebreakvalue1;
     update();
   }
+  bikebreakdownmodel(bikebreakdownmodelvalues){
+    bikebreakdownmode=bikebreakdownmodelvalues;
+    update();
+
+
+
+  }
+  generialmodel(generalmodels){
+    generalmodel=generalmodels;
+    update();
+
+  }
 
   @override
   void onInit() {
@@ -175,10 +189,10 @@ class Servicecontroller extends GetxController {
   
  
 
-  formvalide(String text, Color clr) {
-    valid = text;
-    color = clr;
-    update();
-  }
+  // formvalide(String text, Color clr) {
+  //   valid = text;
+  //   color = clr;
+  //   update();
+  // }
   
 }

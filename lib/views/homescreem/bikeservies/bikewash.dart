@@ -5,6 +5,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
+import 'package:native_notify/native_notify.dart';
 
 class Bikewash extends StatelessWidget {
   Bikewash({Key? key}) : super(key: key);
@@ -74,7 +76,12 @@ class Bikewash extends StatelessWidget {
 
                       return InkWell(
                         onTap: () {
-                          Get.to(Bikewashform(userid:ownerdetails.id ,shopname: ownerdetails['showname'],ownername: ['ownername'],location: ownerdetails['location'],));
+                          Get.to(Bikewashform(
+                            userid: ownerdetails.id,
+                            shopname: ownerdetails['showname'],
+                            ownername: ['ownername'],
+                            location: ownerdetails['location'],
+                          ));
                         },
                         child: Column(
                           // crossAxisAlignment: CrossAxisAlignment.end,
@@ -163,11 +170,14 @@ $location""",
 }
 
 class Bikewashform extends StatelessWidget {
-  Bikewashform({Key? key, required this.userid,
+  Bikewashform(
+      {Key? key,
+      required this.userid,
       required this.ownername,
       required this.shopname,
-      required this.location}) : super(key: key);
-   var userid;
+      required this.location})
+      : super(key: key);
+  var userid;
   var ownername;
   var shopname;
   var location;
@@ -178,11 +188,10 @@ class Bikewashform extends StatelessWidget {
   var names = '';
   final currentuserid = FirebaseAuth.instance.currentUser!.uid;
 
-
   @override
   Widget build(BuildContext context) {
     work.text = "Bikewash";
-     name.text = names;
+    name.text = names;
     return SafeArea(
       child: Scaffold(
         backgroundColor: Colors.black,
@@ -326,7 +335,13 @@ class Bikewashform extends StatelessWidget {
                       backgroundColor:
                           MaterialStateProperty.all(Color(0xFF62A769)),
                     ),
-                    onPressed: () {},
+                    onPressed: () async {
+                      if (_formKey.currentState!.validate()) {
+                        yourIndiePushSendingFunction();
+                        await bikewashform();
+                        Navigator.pop(context);
+                      }
+                    },
                     child: Text(
                       "Continue",
                       style: TextStyle(
@@ -341,8 +356,9 @@ class Bikewashform extends StatelessWidget {
       ),
     );
   }
-  bikewashform()async{
-      final controler = Get.put(Servicecontroller());
+
+  bikewashform() async {
+    final controler = Get.put(Servicecontroller());
     bool expire = false;
 
     var user = FirebaseAuth.instance.currentUser;
@@ -371,10 +387,16 @@ class Bikewashform extends StatelessWidget {
       "username": names,
       "experied": expire,
       "currenuserid": currentuserid,
-      "latitude":controler.latitude.value,
-      "logitude":controler.longitude.value
+      "latitude": controler.latitude.value,
+      "logitude": controler.longitude.value,
+      "date": DateFormat('dd-MM-yyyy').format(DateTime.now())
     }).then((value) => print("carwashform"));
   }
-    
-  }
 
+  void yourIndiePushSendingFunction() {
+    NativeNotify.sendIndieNotification(472, 'qMMR6PMv5Lfht6dCRrmQzA', '4',
+        'You have new request', '$names', null, null);
+    // yourAppID, yourAppToken, 'your_sub_id', 'your_title', 'your_body' is required
+    // put null in any other parameter you do NOT want to use
+  }
+}

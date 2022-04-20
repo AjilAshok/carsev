@@ -1,4 +1,3 @@
-
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:carserv/contoller/controler.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -221,12 +220,9 @@ class Engineform extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
   final engineformcontroler = Get.put(Servicecontroller());
   var name = '';
-   
 
   @override
   Widget build(BuildContext context) {
-     
-     
     enginecontrole.text = 'Engineworks';
     return SafeArea(
       child: Scaffold(
@@ -326,9 +322,17 @@ class Engineform extends StatelessWidget {
                                 BorderRadius.all(Radius.circular(12.0)),
                             border: Border.all(color: Color(0xFF008000))),
                         child: DropdownButtonHideUnderline(
-                          child: DropdownButton(
+                          child: DropdownButtonFormField(
+                              decoration: InputDecoration(
+                            border: InputBorder.none
+                          ),
+                              validator: (values) {
+                                if (values == null) {
+                                  return "Select the field";
+                                }
+                              },
                               hint: Padding(
-                                padding: const EdgeInsets.all(8.0),
+                                padding: const EdgeInsets.only(left: 10),
                                 child: Text(
                                   "Manufacture",
                                   style: TextStyle(color: Colors.white),
@@ -360,9 +364,17 @@ class Engineform extends StatelessWidget {
                                 BorderRadius.all(Radius.circular(12.0)),
                             border: Border.all(color: Color(0xFF008000))),
                         child: DropdownButtonHideUnderline(
-                          child: DropdownButton(
+                          child: DropdownButtonFormField(
+                              decoration: InputDecoration(
+                            border: InputBorder.none
+                          ),
+                              validator: (values) {
+                                if (values == null) {
+                                  return "Select the field";
+                                }
+                              },
                               hint: Padding(
-                                padding: const EdgeInsets.all(8.0),
+                                padding: const EdgeInsets.only(left: 10),
                                 child: Text(
                                   "Model",
                                   style: TextStyle(color: Colors.white),
@@ -395,9 +407,17 @@ class Engineform extends StatelessWidget {
                                 BorderRadius.all(Radius.circular(12.0)),
                             border: Border.all(color: Color(0xFF008000))),
                         child: DropdownButtonHideUnderline(
-                          child: DropdownButton(
+                          child: DropdownButtonFormField(
+                              decoration: InputDecoration(
+                            border: InputBorder.none
+                          ),
+                            validator: (values) {
+                              if (values == null) {
+                                return "Select the field";
+                              }
+                            },
                             hint: Padding(
-                              padding: const EdgeInsets.all(8.0),
+                              padding: const EdgeInsets.only(left: 10),
                               child: Text(
                                 "Year",
                                 style: TextStyle(color: Colors.white),
@@ -414,7 +434,7 @@ class Engineform extends StatelessWidget {
                               return DropdownMenuItem(
                                   value: value,
                                   child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
+                                    padding: const EdgeInsets.only(left: 10),
                                     child: Text(value,
                                         style: TextStyle(
                                             color: Color.fromARGB(
@@ -453,14 +473,7 @@ class Engineform extends StatelessWidget {
                     ),
                   ),
                 ),
-                Padding(
-                  padding: EdgeInsets.all(8),
-                  child: GetBuilder<Servicecontroller>(
-                      builder: (controller) => Text(
-                            controller.valid.toString(),
-                            style: TextStyle(color: controller.color),
-                          )),
-                ),
+                
                 SizedBox(
                   height: 50,
                 ),
@@ -474,24 +487,10 @@ class Engineform extends StatelessWidget {
                             MaterialStateProperty.all(Color(0xFF62A769)),
                       ),
                       onPressed: () async {
-                        //  final controller = Get.find<Servicecontroller>();
-                        if (controller.valueengine1 != null) {
-                          // print(controller.valueengine1);
-                          controller.formvalide("Select a option", Colors.red);
-                        }
-                        if (controller.valuemodel != null) {
-                          // print(controller.valuemodel);
-                          controller.formvalide("Select a option", Colors.red);
-                        }
-                        if (controller.valueengine != null) {
-                          // print(controller.valueengine);
-                          controller.formvalide("Select a option", Colors.red);
-                        }
-                        // print(controller.valueengine);
                         if (_formKey.currentState!.validate()) {
                           await engineworkform();
-                          yourIndiePushSendingFunction(); 
-                        // print('object');
+                          yourIndiePushSendingFunction();
+                          // print('object');
                           Navigator.pop(context);
                         }
                       },
@@ -516,7 +515,7 @@ class Engineform extends StatelessWidget {
   DropdownMenuItem<String> buildmenu(String item) => DropdownMenuItem(
       value: item,
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.only(left: 10),
         child: Text(
           item,
           style: const TextStyle(color: Color.fromARGB(255, 250, 250, 250)),
@@ -524,11 +523,9 @@ class Engineform extends StatelessWidget {
       ));
 
   engineworkform() async {
-     
     bool expire = false;
     print('alsdjlfd');
 
-    
     var user = FirebaseAuth.instance.currentUser;
     var collection = FirebaseFirestore.instance.collection('Users');
     var docSnapshot = await collection.doc(user!.uid).get();
@@ -541,12 +538,11 @@ class Engineform extends StatelessWidget {
     }
 
     final controller = Get.find<Servicecontroller>();
-   
+
     final currentuserid = FirebaseAuth.instance.currentUser!.uid;
     print(currentuserid);
     // print(userid);
     print(controller.latitude.value);
-  
 
     CollectionReference userform =
         FirebaseFirestore.instance.collection("Userform");
@@ -565,16 +561,17 @@ class Engineform extends StatelessWidget {
       "username": name,
       "currenuserid": currentuserid,
       "experied": expire,
-      "latitude":controller.latitude.value,
-      "logitude":controller.longitude.value,
-      "date":DateFormat('dd-MM-yyyy').format(DateTime.now())
+      "latitude": controller.latitude.value,
+      "logitude": controller.longitude.value,
+      "date": DateFormat('dd-MM-yyyy').format(DateTime.now())
     }).then((value) => print("usweengineform"));
     // .onError((error, stackTrace) => print(error));
   }
- void yourIndiePushSendingFunction() {
-    
-    NativeNotify.sendIndieNotification(472, 'qMMR6PMv5Lfht6dCRrmQzA', '4', 'You have new request', '$name', null, null);
+
+  void yourIndiePushSendingFunction() {
+    NativeNotify.sendIndieNotification(472, 'qMMR6PMv5Lfht6dCRrmQzA', '4',
+        'You have new request', '$name', null, null);
     // yourAppID, yourAppToken, 'your_sub_id', 'your_title', 'your_body' is required
     // put null in any other parameter you do NOT want to use
-}
+  }
 }

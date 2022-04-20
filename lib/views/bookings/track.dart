@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:carserv/contoller/controler.dart';
+import 'package:carserv/views/bookings/request.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -25,7 +26,11 @@ class Trackmap extends StatefulWidget {
       required this.shopname,
       required this.work,
       required this.ownername,
-      required this.curretuserid})
+      required this.curretuserid,
+      required this.ownerid,
+      required this.username,
+      required this.docid,
+      })
       : super(key: key);
   int index;
   var latitude;
@@ -35,6 +40,12 @@ class Trackmap extends StatefulWidget {
   var curretuserid;
   var work;
   var ownername;
+  var ownerid;
+  var username;
+  var amount;
+  var sparechanged;
+  String docid;
+  
 
   @override
   State<Trackmap> createState() => _TrackmapState();
@@ -46,7 +57,7 @@ class _TrackmapState extends State<Trackmap> {
   void initState() {
     // TODO: implement initState
     super.initState();
-
+print(widget.latitude);
     razorpay = Razorpay();
     razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, handlerpaymentsuccess);
     razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, handlerpaymenterror);
@@ -61,22 +72,31 @@ class _TrackmapState extends State<Trackmap> {
   }
 
   handlerpaymentsuccess(PaymentSuccessResponse response) {
+    
     final controler = Get.put(Servicecontroller());
     Fluttertoast.showToast(
         msg: "SUCCESS: " + response.paymentId.toString(),
         timeInSecForIosWeb: 4);
     CollectionReference billform =
         FirebaseFirestore.instance.collection("Bills");
+        FirebaseFirestore.instance.collection('Accepted').doc(widget.docid).delete().then((value){
+          Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) =>RequestPage() ));
+        });
     return billform.add({
       "nameofowner": widget.ownername,
       "shopname": widget.shopname,
       "paymentoption": "online",
       "work": widget.work,
-      "amount": controler.amount,
+      "amount": widget.amount,
       "userid": widget.curretuserid,
-      "sparechanged": controler.sparechanged,
+      "sparechanged": widget.sparechanged,
+      "ownerid":widget.ownerid,
+      "username":widget.username,
       "date": DateFormat('dd-MM-yyyy').format(DateTime.now())
     }).then((value) => print("billadded"));
+    
+    
+
   }
 
   handlerpaymenterror() {
@@ -90,6 +110,8 @@ class _TrackmapState extends State<Trackmap> {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(Servicecontroller());
+    print(widget.amount);
+    
     //  getlatitide();
     return SafeArea(
         child:
@@ -145,6 +167,8 @@ class _TrackmapState extends State<Trackmap> {
             }
 
             final details = snapshot.data!.docs[widget.index];
+            widget.sparechanged=details['sparechange'];
+            
 
             return Column(
               children: [
@@ -181,6 +205,8 @@ class _TrackmapState extends State<Trackmap> {
                           MaterialStateProperty.all(Color(0xFF62A769)),
                     ),
                     onPressed: () async {
+                      widget.amount=details['amount'];
+                      
                       openchek(details['amount']);
                     },
                     child: Text(
