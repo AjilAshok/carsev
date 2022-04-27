@@ -1,8 +1,11 @@
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:carserv/contoller/controler.dart';
 import 'package:carserv/views/homescreem/widgets/carwashform.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_instance/get_instance.dart';
 import 'package:get/get_navigation/get_navigation.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -16,6 +19,7 @@ class Carwash extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controler=Get.put(Servicecontroller());
     return SafeArea(
         child: Scaffold(
       body: Column(
@@ -63,25 +67,53 @@ class Carwash extends StatelessWidget {
                     child: Text('No owners'),
                   );
                 }
+                 List<Map> ownerDetails = [];
+                  List distance = [];
+
+                  for (int i = 0; i < snapshotshot.data!.docs.length; i++) {
+                   
+                    final doubledistacne = Geolocator.distanceBetween(
+                      controler.latitude.value,
+                      controler.longitude.value,
+                      snapshotshot.data!.docs[i]['latitude'],
+                      snapshotshot.data!.docs[i]['longitude'],
+                    );
+
+                    ownerDetails.add({
+                      'distance': doubledistacne.round().toInt() / 1000,
+                      'shopName': snapshotshot.data!.docs[i]['showname'],
+                      'ownerName': snapshotshot.data!.docs[i]['ownername'],
+                      'location': snapshotshot.data!.docs[i]['location'],
+                      'ownerId': snapshotshot.data!.docs[i].id,
+                    });
+                  }
+
+                  List sortedOwnerList = [
+                    for (var e in ownerDetails)
+                      if (e["distance"] < 15) e
+                  ];
+
+                  print(sortedOwnerList);
 
                 return Expanded(
                   child: ListView.builder(
                     scrollDirection: Axis.vertical,
                     // physics: NeverScrollableScrollPhysics(),
 
-                    itemCount: snapshotshot.data!.docs.length,
+                    itemCount: sortedOwnerList.length,
                     itemBuilder: (context, index) {
                       final washdetails = snapshotshot.data!.docs[index];
                        var location=washdetails['location'];
                       //  print(location);
+                        final sortedOwnerMap = sortedOwnerList[index];
 
 
                       return InkWell(
                         onTap: () {
-                          Get.to(Carwashform(userid: washdetails.id,
-                          shopname: washdetails['showname'],
-                          ownername: washdetails['ownername'],
-                          location:washdetails['location']
+                          Get.to(Carwashform(userid:  sortedOwnerMap['ownerId'],
+                          shopname: sortedOwnerMap['shopName'],
+                          ownername:sortedOwnerMap['ownerName'],
+                          location:sortedOwnerMap['location']
 
                           ));
                         },
@@ -124,10 +156,21 @@ class Carwash extends StatelessWidget {
                             SizedBox(
                               height: 10,
                             ),
-                            Text(
-                              washdetails['showname'],
-                              style: TextStyle(
-                                  fontSize: 25, fontWeight: FontWeight.bold),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Text(
+                                 sortedOwnerMap['shopName'],
+                                  style: TextStyle(
+                                      fontSize: 25, fontWeight: FontWeight.bold),
+                                ),
+                                   Text(
+                                    '${sortedOwnerMap['distance'].round()} KM',
+                                    style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w400),
+                                  ),
+                              ],
                             ),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.end,

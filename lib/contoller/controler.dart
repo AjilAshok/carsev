@@ -163,6 +163,10 @@ class Servicecontroller extends GetxController {
         await placemarkFromCoordinates(position.latitude, position.longitude);
     Placemark place = placemark[0];
     address.value = '${place.locality},${place.country}';
+    // print(position.longitude);
+    // print(position.longitude);
+    getdistance(position);
+  
   }
 
   map({required lat,required long} ) {
@@ -179,20 +183,22 @@ class Servicecontroller extends GetxController {
       //  update();
 
   }
-  // Marker  user=Marker(markerId: MarkerId("id-1"),
-  //   position: LatLng(76.3327488,10.0075243),
-  //       infoWindow: InfoWindow(title:"")
-  //       );
-        
-  
-  
-  
- 
+  double distanceinmeterr=0.0;
+  double endlat=63.92384000338432;
+  double englong=-113.01409766077995;
 
-  // formvalide(String text, Color clr) {
-  //   valid = text;
-  //   color = clr;
-  //   update();
-  // }
+  List a = [10,20,30];
+
+  
+
+ Future getdistance(Position position)async{
+    distanceinmeterr= Geolocator.distanceBetween(position.latitude,position.longitude,63.92384000338432, -113.01409766077995);
+    var distance=distanceinmeterr.round().toInt();
+  //   print(distance);
+  //   print("${distance.round()/1000}Km");
+  // List b =  a.where((element) => element >= 20).toList();
+
+  //   print(b);
+  }
   
 }

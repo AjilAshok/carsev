@@ -403,7 +403,7 @@ class Breakdownform extends StatelessWidget {
       "currenuserid": currentuserid,
       "latitude": controller.latitude.value,
       "logitude": controller.longitude.value,
-      "date":DateFormat('dd-MM-yyyy').format(DateTime.now())
+      "date": DateTime.now().millisecondsSinceEpoch
     }).then((value) => print("userbreakdownform"));
   }
   void yourIndiePushSendingFunction() {

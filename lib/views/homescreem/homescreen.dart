@@ -6,6 +6,7 @@ import 'package:carserv/views/homescreem/widgets/breakdown.dart';
 import 'package:carserv/views/homescreem/widgets/carwash.dart';
 import 'package:carserv/views/homescreem/widgets/enginework.dart';
 import 'package:carserv/views/homescreem/widgets/oilwork.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -16,6 +17,8 @@ import 'package:carousel_slider/carousel_slider.dart';
 class Mainhomescreen extends StatelessWidget {
   Mainhomescreen({Key? key}) : super(key: key);
    String deviceTokenToSendPushNotification='';
+   var user=FirebaseAuth.instance.currentUser;
+   
 
   final images = [
     "https://media.istockphoto.com/photos/hands-of-car-mechanic-picture-id490048372?b=1&k=20&m=490048372&s=170667a&w=0&h=9wdQr-kSrbGaDMi7PzO9B0nBB9VfZWA00zL9UE3Dtqw=",
@@ -50,6 +53,9 @@ class Mainhomescreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print(user!.uid);
+
+    
     getDeviceTokenToSendNotification();
     return SafeArea(
         child: Scaffold(

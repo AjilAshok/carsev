@@ -22,7 +22,7 @@ class Registeraion extends StatelessWidget {
     Future<void> adduser() {
       return user
           .doc(firebaseuser!.uid.toString())
-          .set({"Name": name.text, "email": gmail.text,"phonenumber":firebaseuser.phoneNumber, "date":DateFormat('dd-MM-yyyy').format(DateTime.now())})
+          .set({"Name": name.text, "email": gmail.text,"phonenumber":firebaseuser.phoneNumber, "date":DateTime.now().millisecondsSinceEpoch})
           .then((value) => print("user added"))
           .catchError((error) => print(error));
     }

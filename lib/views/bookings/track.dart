@@ -52,6 +52,7 @@ class Trackmap extends StatefulWidget {
 }
 
 class _TrackmapState extends State<Trackmap> {
+  final user=FirebaseAuth.instance.currentUser;
   late Razorpay razorpay;
   @override
   void initState() {
@@ -92,8 +93,11 @@ print(widget.latitude);
       "sparechanged": widget.sparechanged,
       "ownerid":widget.ownerid,
       "username":widget.username,
-      "date": DateFormat('dd-MM-yyyy').format(DateTime.now())
-    }).then((value) => print("billadded"));
+      "date": DateTime.now().millisecondsSinceEpoch
+    }).then((value) {
+       FirebaseFirestore.instance.collection('Amountform').doc(widget.docid).delete();
+       print("billadded");
+    });
     
     
 
@@ -109,6 +113,7 @@ print(widget.latitude);
 
   @override
   Widget build(BuildContext context) {
+    print(user!.uid);
     final controller = Get.put(Servicecontroller());
     print(widget.amount);
     
@@ -139,7 +144,7 @@ print(widget.latitude);
       ),
       StreamBuilder<QuerySnapshot>(
           stream:
-              FirebaseFirestore.instance.collection('Amountform').snapshots(),
+              FirebaseFirestore.instance.collection('Amountform').where('currenuserid',isEqualTo:user!.uid ).snapshots(),
           builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
             if (snapshot.data == null) {
               return Center(
@@ -168,6 +173,8 @@ print(widget.latitude);
 
             final details = snapshot.data!.docs[widget.index];
             widget.sparechanged=details['sparechange'];
+            DateTime dateTime= DateTime.fromMillisecondsSinceEpoch(details['date']);
+         var date=   DateFormat('dd-MM-yyyy').format(dateTime);
             
 
             return Column(
@@ -184,7 +191,7 @@ print(widget.latitude);
                 SizedBox(
                   height: 10,
                 ),
-                listforms(details['date']),
+                listforms(date),
                 SizedBox(
                   height: 10,
                 ),

@@ -1,9 +1,13 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:carserv/contoller/controler.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
+import 'package:native_notify/native_notify.dart';
 
 class Generalservice extends StatelessWidget {
   Generalservice({Key? key}) : super(key: key);
@@ -14,6 +18,7 @@ class Generalservice extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controler = Get.put(Servicecontroller());
     return SafeArea(
       child: Scaffold(
         body: Column(
@@ -40,11 +45,15 @@ class Generalservice extends StatelessWidget {
               height: 30,
             ),
             StreamBuilder<QuerySnapshot>(
-              stream: FirebaseFirestore.instance.collection('Owner').where("type", isEqualTo: 'Bike')
-                    .where("chekbox", arrayContainsAny: ["Enginework","Oilchange"])
-                    .snapshots(),
-              builder: (context, AsyncSnapshot<QuerySnapshot> snapshot ) {
-                 if (snapshot.connectionState == ConnectionState.waiting) {
+                stream: FirebaseFirestore.instance
+                    .collection('Owner')
+                    .where("type", isEqualTo: 'Bike')
+                    .where("chekbox", arrayContainsAny: [
+                  "Enginework",
+                  "Oilchange"
+                ]).snapshots(),
+                builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
                     return Center(
                       child: CircularProgressIndicator(),
                     );
@@ -53,86 +62,130 @@ class Generalservice extends StatelessWidget {
                       child: Text('No owners'),
                     );
                   }
-                return Expanded(
-                  child: ListView.builder(
-                    scrollDirection: Axis.vertical,
-                    // physics: NeverScrollableScrollPhysics(),
-            
-                    itemCount: snapshot.data!.docs.length,
-                    itemBuilder: (context, index) {
-                       final ownerdetails = snapshot.data!.docs[index];
-                       var location=ownerdetails['location'];
+                  List<Map> ownerDetails = [];
+                  List distance = [];
 
-                      return InkWell(
-                        onTap: () {
-                          Get.to(Generalform());
-                        },
-                        child: Column(
-                          // crossAxisAlignment: CrossAxisAlignment.end,
-            
-                          children: [
-                            Divider(
-                              thickness: 1,
-                              color: Colors.black,
-                            ),
-            
-                            Row(
-                              children: [
-                                Container(
-                                  margin: EdgeInsets.all(5),
-                                  height: 150,
-                                  width: MediaQuery.of(context).size.width / 2,
-                                  color: Colors.green,
-                                  child: Image(
-                                    image: AssetImage(
-                                        "assets/motorcycle-parts-garage-kitchen-blurry_151013-34169.webp"),
-                                    fit: BoxFit.cover,
+                  for (int i = 0; i < snapshot.data!.docs.length; i++) {
+                    final doubledistacne = Geolocator.distanceBetween(
+                      controler.latitude.value,
+                      controler.longitude.value,
+                      snapshot.data!.docs[i]['latitude'],
+                      snapshot.data!.docs[i]['longitude'],
+                    );
+
+                    ownerDetails.add({
+                      'distance': doubledistacne.round().toInt() / 1000,
+                      'shopName': snapshot.data!.docs[i]['showname'],
+                      'ownerName': snapshot.data!.docs[i]['ownername'],
+                      'location': snapshot.data!.docs[i]['location'],
+                      'ownerId': snapshot.data!.docs[i].id,
+                    });
+                  }
+
+                  List sortedOwnerList = [
+                    for (var e in ownerDetails)
+                      if (e["distance"] < 15) e
+                  ];
+
+                  print(sortedOwnerList);
+                  return Expanded(
+                    child: ListView.builder(
+                      scrollDirection: Axis.vertical,
+                      // physics: NeverScrollableScrollPhysics(),
+
+                      itemCount: sortedOwnerList.length,
+                      itemBuilder: (context, index) {
+                        final ownerdetails = snapshot.data!.docs[index];
+                        var location = ownerdetails['location'];
+                        final sortedOwnerMap = sortedOwnerList[index];
+
+                        return InkWell(
+                          onTap: () {
+                            Get.to(Generalform(
+                              userid: sortedOwnerMap['ownerId'],
+                                shopname: sortedOwnerMap['shopName'],
+                                ownername: sortedOwnerMap['ownerName'],
+                                location: sortedOwnerMap['location'],
+                            ));
+                          },
+                          child: Column(
+                            // crossAxisAlignment: CrossAxisAlignment.end,
+
+                            children: [
+                              Divider(
+                                thickness: 1,
+                                color: Colors.black,
+                              ),
+
+                              Row(
+                                children: [
+                                  Container(
+                                    margin: EdgeInsets.all(5),
+                                    height: 150,
+                                    width:
+                                        MediaQuery.of(context).size.width / 2,
+                                    color: Colors.green,
+                                    child: Image(
+                                      image: AssetImage(
+                                          "assets/motorcycle-parts-garage-kitchen-blurry_151013-34169.webp"),
+                                      fit: BoxFit.cover,
+                                    ),
                                   ),
-                                ),
-                                Container(
-                                  width: MediaQuery.of(context).size.width * 0.46,
-                                  child: Text(
-                                    """Company  service Time Duration 30 Hourpick from you and service
+                                  Container(
+                                    width: MediaQuery.of(context).size.width *
+                                        0.46,
+                                    child: Text(
+                                      """Company  service Time Duration 30 Hourpick from you and service
                                     $location""",
-                                    style: TextStyle(fontSize: 20),
-                                  ),
-                                )
-                              ],
-                            ),
-                            //  Divider(
-                            //   thickness: 1,
-                            //   color: Colors.black,
-                            // ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Text(
-                              ownerdetails['showname'],
-                              style: TextStyle(
-                                  fontSize: 25, fontWeight: FontWeight.bold),
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                Text("Minimum Amount  ",
-                                    style: TextStyle(fontSize: 15)),
-                                Text("₹100",
+                                      style: TextStyle(fontSize: 20),
+                                    ),
+                                  )
+                                ],
+                              ),
+                              //  Divider(
+                              //   thickness: 1,
+                              //   color: Colors.black,
+                              // ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Row(
+                                children: [
+                                  Text(
+                                     sortedOwnerMap['shopName'],
                                     style: TextStyle(
-                                        fontSize: 20, fontWeight: FontWeight.bold)),
-                              ],
-                            ),
-                            Divider(
-                              thickness: 1,
-                              color: Colors.black,
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-                );
-              }
-            )
+                                        fontSize: 25, fontWeight: FontWeight.bold),
+                                  ),
+                                   Text(
+                                    '${sortedOwnerMap['distance'].round()} KM',
+                                    style:const TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w400),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Text("Minimum Amount  ",
+                                      style: TextStyle(fontSize: 15)),
+                                  Text("₹100",
+                                      style: TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold)),
+                                ],
+                              ),
+                              Divider(
+                                thickness: 1,
+                                color: Colors.black,
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                })
           ],
         ),
       ),
@@ -153,7 +206,13 @@ class Generalservice extends StatelessWidget {
 }
 
 class Generalform extends StatelessWidget {
-  Generalform({Key? key}) : super(key: key);
+  Generalform(
+      {Key? key,
+      required this.userid,
+      required this.ownername,
+      required this.shopname,
+      required this.location})
+      : super(key: key);
   final generalitems = [
     "item 1",
     "item 2",
@@ -164,7 +223,7 @@ class Generalform extends StatelessWidget {
     "item 7",
     "item 8"
   ];
- final generworksmodel=[
+  final generworksmodel = [
     "model 1",
     "model 2",
     "model 3",
@@ -173,8 +232,7 @@ class Generalform extends StatelessWidget {
     "model 6",
     "model 7",
     "model 8"
-
- ];
+  ];
   final bikeyears = [
     "2010",
     "2011",
@@ -189,21 +247,36 @@ class Generalform extends StatelessWidget {
     "2020",
     "2021"
   ];
-  TextEditingController generalwork=TextEditingController();
+  TextEditingController generalwork = TextEditingController();
+  TextEditingController issues = TextEditingController();
+  var names;
+  var userid;
+  var ownername;
+  var shopname;
+  var location;
+
   final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
-    generalwork.text="General work";
+    generalwork.text = "General work";
     return SafeArea(
       child: Scaffold(
         backgroundColor: Colors.black,
         appBar: AppBar(
+          leading: IconButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: Icon(
+                Icons.arrow_back_ios,
+                color: Colors.black,
+              )),
           elevation: 0,
           backgroundColor: Color(0XFF738878),
           title: Text(
-            "Enginework",
-            style: TextStyle(color: Colors.white),
+            "General works",
+            style: TextStyle(color: Colors.black),
           ),
         ),
         body: SingleChildScrollView(
@@ -276,27 +349,26 @@ class Generalform extends StatelessWidget {
                 ),
                 GetBuilder<Servicecontroller>(
                   builder: (controller) => Padding(
-                    padding:
-                        EdgeInsets.only(top: 0, left: 50, right: 50, bottom: 10),
+                    padding: EdgeInsets.only(
+                        top: 0, left: 50, right: 50, bottom: 10),
                     child: Theme(
                       data: Theme.of(context).copyWith(
                         canvasColor: Colors.black,
                       ),
                       child: Container(
                         decoration: BoxDecoration(
-                            borderRadius: BorderRadius.all(Radius.circular(12.0)),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(12.0)),
                             border: Border.all(color: Color(0xFF008000))),
                         child: DropdownButtonHideUnderline(
                           child: DropdownButtonFormField(
-                            decoration: InputDecoration(
-                            border: InputBorder.none
-                            ),
-                            validator: ((value) {
-                              if (value==null) {
-                                return "Select a field";
-                                
-                              }
-                            }),
+                              decoration:
+                                  InputDecoration(border: InputBorder.none),
+                              validator: ((value) {
+                                if (value == null) {
+                                  return "Select a field";
+                                }
+                              }),
                               hint: Padding(
                                 padding: const EdgeInsets.only(left: 10),
                                 child: Text(
@@ -318,27 +390,26 @@ class Generalform extends StatelessWidget {
                 ),
                 GetBuilder<Servicecontroller>(
                   builder: (controller) => Padding(
-                    padding:
-                        EdgeInsets.only(top: 0, left: 50, right: 50, bottom: 10),
+                    padding: EdgeInsets.only(
+                        top: 0, left: 50, right: 50, bottom: 10),
                     child: Theme(
                       data: Theme.of(context).copyWith(
                         canvasColor: Colors.black,
                       ),
                       child: Container(
                         decoration: BoxDecoration(
-                            borderRadius: BorderRadius.all(Radius.circular(12.0)),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(12.0)),
                             border: Border.all(color: Color(0xFF008000))),
                         child: DropdownButtonHideUnderline(
                           child: DropdownButtonFormField(
-                             decoration: InputDecoration(
-                            border: InputBorder.none
-                            ),
-                               validator: ((value) {
-                              if (value==null) {
-                                return "Select a field";
-                                
-                              }
-                            }),
+                              decoration:
+                                  InputDecoration(border: InputBorder.none),
+                              validator: ((value) {
+                                if (value == null) {
+                                  return "Select a field";
+                                }
+                              }),
                               hint: Padding(
                                 padding: const EdgeInsets.only(left: 10),
                                 child: Text(
@@ -360,28 +431,27 @@ class Generalform extends StatelessWidget {
                 ),
                 GetBuilder<Servicecontroller>(
                   builder: (controller) => Padding(
-                    padding:
-                        EdgeInsets.only(top: 0, left: 50, right: 50, bottom: 10),
+                    padding: EdgeInsets.only(
+                        top: 0, left: 50, right: 50, bottom: 10),
                     child: Theme(
                       data: Theme.of(context).copyWith(
                         canvasColor: Colors.black,
                       ),
                       child: Container(
                         decoration: BoxDecoration(
-                            borderRadius: BorderRadius.all(Radius.circular(12.0)),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(12.0)),
                             border: Border.all(color: Color(0xFF008000))),
                         child: DropdownButtonHideUnderline(
                           child: DropdownButtonFormField(
-                             decoration: InputDecoration(
-                            border: InputBorder.none
-                            ),
-                              validator: ((value) {
-                              if (value==null) {
+                            decoration:
+                                InputDecoration(border: InputBorder.none),
+                            validator: ((value) {
+                              if (value == null) {
                                 return "Select a field";
-                                
                               }
                             }),
-                            
+
                             hint: Padding(
                               padding: const EdgeInsets.only(left: 10),
                               child: Text(
@@ -417,12 +487,12 @@ class Generalform extends StatelessWidget {
                   padding: const EdgeInsets.only(
                       top: 0, left: 50, right: 50, bottom: 10),
                   child: TextFormField(
-                      validator: ((value) {
-                              if (value==null||value.isEmpty) {
-                                return "Enter some text";
-                                
-                              }
-                            }),
+                    controller: issues,
+                    validator: ((value) {
+                      if (value == null || value.isEmpty) {
+                        return "Enter some text";
+                      }
+                    }),
                     style: TextStyle(color: Colors.white),
                     decoration: const InputDecoration(
                       hintText: "Issue message",
@@ -443,15 +513,18 @@ class Generalform extends StatelessWidget {
                   height: 50,
                 ),
                 Container(
-                   width: 180,
+                  width: 180,
                   height: 50,
                   child: ElevatedButton(
                     style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(Color(0xFF62A769)),
+                      backgroundColor:
+                          MaterialStateProperty.all(Color(0xFF62A769)),
                     ),
-                    onPressed: () {
+                    onPressed: () async {
                       if (_formKey.currentState!.validate()) {
-                        
+                        await generalworkform();
+                        yourIndiePushSendingFunction();
+                        Navigator.pop(context);
                       }
                     },
                     child: Text(
@@ -468,7 +541,8 @@ class Generalform extends StatelessWidget {
       ),
     );
   }
-    DropdownMenuItem<String> buildmenu(String item) => DropdownMenuItem(
+
+  DropdownMenuItem<String> buildmenu(String item) => DropdownMenuItem(
       value: item,
       child: Padding(
         padding: const EdgeInsets.only(left: 10),
@@ -477,4 +551,46 @@ class Generalform extends StatelessWidget {
           style: TextStyle(color: Color.fromARGB(255, 250, 250, 250)),
         ),
       ));
+
+  generalworkform() async {
+    final currentuserid = FirebaseAuth.instance.currentUser!.uid;
+    final controler = Get.put(Servicecontroller());
+    bool expire = false;
+    var user = FirebaseAuth.instance.currentUser;
+    var collection = FirebaseFirestore.instance.collection('Users');
+    var docSnapshot = await collection.doc(user!.uid).get();
+    if (docSnapshot.exists) {
+      Map<String, dynamic>? data = docSnapshot.data();
+      names = data?['Name'];
+
+      print(names);
+    }
+    CollectionReference bikegeneraworkform =
+        FirebaseFirestore.instance.collection("Userform");
+    return bikegeneraworkform.add({
+      "work": generalwork.text,
+      "Manufacture": controler.genarall.toString(),
+      "model": controler.generalmodel.toString(),
+      'year': controler.genalralyear.toString(),
+      "issues": issues.text,
+      "owerid": userid,
+      "location": location,
+      "shopname": shopname,
+      "ownername": ownername,
+      "userlocation": controler.address.value,
+      "username": names,
+      "experied": expire,
+      "currenuserid": currentuserid,
+      "latitude": controler.latitude.value,
+      "logitude": controler.longitude.value,
+      "date": DateTime.now().millisecondsSinceEpoch
+    }).then((value) => print("generalformadd"));
+  }
+
+  void yourIndiePushSendingFunction() {
+    NativeNotify.sendIndieNotification(472, 'qMMR6PMv5Lfht6dCRrmQzA', '4',
+        'You have new request', '$names', null, null);
+    // yourAppID, yourAppToken, 'your_sub_id', 'your_title', 'your_body' is required
+    // put null in any other parameter you do NOT want to use
+  }
 }

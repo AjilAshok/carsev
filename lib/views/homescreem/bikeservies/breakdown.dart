@@ -3,6 +3,7 @@ import 'package:carserv/contoller/controler.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:get/get_state_manager/src/simple/get_state.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -18,6 +19,7 @@ class Breakdownbike extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controler=Get.put(Servicecontroller());
     return SafeArea(
       child: Scaffold(
         body: Column(
@@ -59,19 +61,52 @@ class Breakdownbike extends StatelessWidget {
                       child: Text('No owners'),
                     );
                   }
+                   List<Map> ownerDetails = [];
+                  List distance = [];
+
+                  for (int i = 0; i < snapshot.data!.docs.length; i++) {
+                   
+                    final doubledistacne = Geolocator.distanceBetween(
+                      controler.latitude.value,
+                      controler.longitude.value,
+                      snapshot.data!.docs[i]['latitude'],
+                      snapshot.data!.docs[i]['longitude'],
+                    );
+
+                    ownerDetails.add({
+                      'distance': doubledistacne.round().toInt() / 1000,
+                      'shopName': snapshot.data!.docs[i]['showname'],
+                      'ownerName': snapshot.data!.docs[i]['ownername'],
+                      'location': snapshot.data!.docs[i]['location'],
+                      'ownerId': snapshot.data!.docs[i].id,
+                    });
+                  }
+
+                  List sortedOwnerList = [
+                    for (var e in ownerDetails)
+                      if (e["distance"] < 15) e
+                  ];
+
+                  print(sortedOwnerList);
                   return Expanded(
                     child: ListView.builder(
                       scrollDirection: Axis.vertical,
                       // physics: NeverScrollableScrollPhysics(),
 
-                      itemCount: snapshot.data!.docs.length,
+                      itemCount: sortedOwnerList.length,
                       itemBuilder: (context, index) {
                         final ownerdetails = snapshot.data!.docs[index];
                         var location = ownerdetails['location'];
+                         final sortedOwnerMap = sortedOwnerList[index];
 
                         return InkWell(
                           onTap: () {
-                            Get.to(Bikebreakdownform(userid:ownerdetails.id ,shopname: ownerdetails['showname'],ownername:ownerdetails['ownername'],location:ownerdetails['location']  ,));
+                            Get.to(Bikebreakdownform(
+                              userid: sortedOwnerMap['ownerId'],
+                                shopname: sortedOwnerMap['shopName'],
+                                ownername: sortedOwnerMap['ownerName'],
+                                location: sortedOwnerMap['location'],
+                            ));
                           },
                           child: Column(
                             // crossAxisAlignment: CrossAxisAlignment.end,
@@ -114,10 +149,20 @@ class Breakdownbike extends StatelessWidget {
                               SizedBox(
                                 height: 10,
                               ),
-                              Text(
-                                ownerdetails['showname'],
-                                style: TextStyle(
-                                    fontSize: 25, fontWeight: FontWeight.bold),
+                              Row(
+                                children: [
+                                  Text(
+                                    sortedOwnerMap['shopName'],
+                                    style: TextStyle(
+                                        fontSize: 25, fontWeight: FontWeight.bold),
+                                  ),
+                                   Text(
+                                    '${sortedOwnerMap['distance'].round()} KM',
+                                    style:const TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w400),
+                                  ),
+                                ],
                               ),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.end,
@@ -161,7 +206,13 @@ class Breakdownbike extends StatelessWidget {
 }
 
 class Bikebreakdownform extends StatelessWidget {
-  Bikebreakdownform({Key? key,required this.userid,required this.location,required this.shopname,required this.ownername}) : super(key: key);
+  Bikebreakdownform(
+      {Key? key,
+      required this.userid,
+      required this.location,
+      required this.shopname,
+      required this.ownername})
+      : super(key: key);
   final bikesites = [
     "item 1",
     "item 2",
@@ -173,8 +224,8 @@ class Bikebreakdownform extends StatelessWidget {
     "item 8"
   ];
 
-  final bikemodel=[
-     "model 1",
+  final bikemodel = [
+    "model 1",
     "model 2",
     "model 3",
     "model 4",
@@ -182,7 +233,6 @@ class Bikebreakdownform extends StatelessWidget {
     "model 6",
     "model 7",
     "model 8"
-
   ];
   final bikesyears = [
     "2010",
@@ -199,8 +249,8 @@ class Bikebreakdownform extends StatelessWidget {
     "2021"
   ];
   final _formKey = GlobalKey<FormState>();
-  TextEditingController work=TextEditingController();
-  TextEditingController issues=TextEditingController();
+  TextEditingController work = TextEditingController();
+  TextEditingController issues = TextEditingController();
   var names;
   var userid;
   var ownername;
@@ -209,16 +259,24 @@ class Bikebreakdownform extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    work.text="Breakdown";
+    work.text = "Breakdown";
     return SafeArea(
       child: Scaffold(
         backgroundColor: Colors.black,
         appBar: AppBar(
+          leading: IconButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: Icon(
+                Icons.arrow_back_ios,
+                color: Colors.black,
+              )),
           elevation: 0,
           backgroundColor: Color(0XFF738878),
           title: Text(
             "Breakdown",
-            style: TextStyle(color: Colors.white),
+            style: TextStyle(color: Colors.black),
           ),
         ),
         body: SingleChildScrollView(
@@ -274,14 +332,11 @@ class Bikebreakdownform extends StatelessWidget {
                       top: 50, left: 50, right: 50, bottom: 10),
                   child: TextFormField(
                     controller: work,
-                    validator: (values){
-                      if (values==null||values.isEmpty) {
+                    validator: (values) {
+                      if (values == null || values.isEmpty) {
                         return "Enter the text";
-                        
                       }
                     },
-
-                    
                     style: TextStyle(color: Colors.white),
                     decoration: InputDecoration(
                       hintText: "Work",
@@ -299,21 +354,21 @@ class Bikebreakdownform extends StatelessWidget {
                 ),
                 GetBuilder<Servicecontroller>(
                   builder: (controller) => Padding(
-                    padding:
-                        EdgeInsets.only(top: 0, left: 50, right: 50, bottom: 10),
+                    padding: EdgeInsets.only(
+                        top: 0, left: 50, right: 50, bottom: 10),
                     child: Theme(
                       data: Theme.of(context).copyWith(
                         canvasColor: Colors.black,
                       ),
                       child: Container(
                         decoration: BoxDecoration(
-                            borderRadius: BorderRadius.all(Radius.circular(12.0)),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(12.0)),
                             border: Border.all(color: Color(0xFF008000))),
                         child: DropdownButtonHideUnderline(
                           child: DropdownButtonFormField(
-                              decoration: InputDecoration(
-                              border: InputBorder.none
-                            ),
+                              decoration:
+                                  InputDecoration(border: InputBorder.none),
                               hint: Padding(
                                 padding: const EdgeInsets.only(left: 10),
                                 child: Text(
@@ -340,26 +395,26 @@ class Bikebreakdownform extends StatelessWidget {
                 ),
                 GetBuilder<Servicecontroller>(
                   builder: (controller) => Padding(
-                    padding:
-                        EdgeInsets.only(top: 0, left: 50, right: 50, bottom: 10),
+                    padding: EdgeInsets.only(
+                        top: 0, left: 50, right: 50, bottom: 10),
                     child: Theme(
                       data: Theme.of(context).copyWith(
                         canvasColor: Colors.black,
                       ),
                       child: Container(
                         decoration: BoxDecoration(
-                            borderRadius: BorderRadius.all(Radius.circular(12.0)),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(12.0)),
                             border: Border.all(color: Color(0xFF008000))),
                         child: DropdownButtonHideUnderline(
                           child: DropdownButtonFormField(
-                              decoration: InputDecoration(
-                              border: InputBorder.none
-                            ),
-                            validator: (values){
-                               if (values == null) {
+                              decoration:
+                                  InputDecoration(border: InputBorder.none),
+                              validator: (values) {
+                                if (values == null) {
                                   return "Select the field";
                                 }
-                            },
+                              },
                               hint: Padding(
                                 padding: const EdgeInsets.only(left: 10),
                                 child: Text(
@@ -381,26 +436,26 @@ class Bikebreakdownform extends StatelessWidget {
                 ),
                 GetBuilder<Servicecontroller>(
                   builder: (controller) => Padding(
-                    padding:
-                        EdgeInsets.only(top: 0, left: 50, right: 50, bottom: 10),
+                    padding: EdgeInsets.only(
+                        top: 0, left: 50, right: 50, bottom: 10),
                     child: Theme(
                       data: Theme.of(context).copyWith(
                         canvasColor: Colors.black,
                       ),
                       child: Container(
                         decoration: BoxDecoration(
-                            borderRadius: BorderRadius.all(Radius.circular(12.0)),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(12.0)),
                             border: Border.all(color: Color(0xFF008000))),
                         child: DropdownButtonHideUnderline(
                           child: DropdownButtonFormField(
-                            decoration: InputDecoration(
-                              border: InputBorder.none
-                            ),
-                             validator: (values) {
-                                if (values == null) {
-                                  return "Select a field";
-                                }
-                              },
+                            decoration:
+                                InputDecoration(border: InputBorder.none),
+                            validator: (values) {
+                              if (values == null) {
+                                return "Select a field";
+                              }
+                            },
                             hint: Padding(
                               padding: const EdgeInsets.only(left: 10),
                               child: Text(
@@ -437,11 +492,11 @@ class Bikebreakdownform extends StatelessWidget {
                       top: 0, left: 50, right: 50, bottom: 10),
                   child: TextFormField(
                     controller: issues,
-                     validator: (values) {
-                                if (values == null||values.isEmpty) {
-                                  return "Select a text";
-                                }
-                              },
+                    validator: (values) {
+                      if (values == null || values.isEmpty) {
+                        return "Select a text";
+                      }
+                    },
                     style: TextStyle(color: Colors.white),
                     decoration: const InputDecoration(
                       hintText: "Issue message",
@@ -469,9 +524,8 @@ class Bikebreakdownform extends StatelessWidget {
                       backgroundColor:
                           MaterialStateProperty.all(Color(0xFF62A769)),
                     ),
-                    onPressed: ()async {
-
-                      if(_formKey.currentState!.validate()){
+                    onPressed: () async {
+                      if (_formKey.currentState!.validate()) {
                         await bikebreakdownform();
                         yourIndiePushSendingFunction();
                         Navigator.pop(context);
@@ -491,7 +545,8 @@ class Bikebreakdownform extends StatelessWidget {
       ),
     );
   }
-  bikebreakdownform()async{
+
+  bikebreakdownform() async {
     final currentuserid = FirebaseAuth.instance.currentUser!.uid;
     final controler = Get.put(Servicecontroller());
     bool expire = false;
@@ -501,15 +556,15 @@ class Bikebreakdownform extends StatelessWidget {
     if (docSnapshot.exists) {
       Map<String, dynamic>? data = docSnapshot.data();
       names = data?['Name'];
-    
+
       print(names);
     }
 
-     CollectionReference bikebrekdownform =
+    CollectionReference bikebrekdownform =
         FirebaseFirestore.instance.collection("Userform");
     return bikebrekdownform.add({
       "work": work.text,
-      "Manufacture":controler.bikebrekdown.toString(),
+      "Manufacture": controler.bikebrekdown.toString(),
       "model": controler.bikebreakdownmode.toString(),
       'year': controler.bikebrekdown1.toString(),
       "issues": issues.text,
@@ -523,18 +578,16 @@ class Bikebreakdownform extends StatelessWidget {
       "currenuserid": currentuserid,
       "latitude": controler.latitude.value,
       "logitude": controler.longitude.value,
-      "date": DateFormat('dd-MM-yyyy').format(DateTime.now())
+      "date": DateTime.now().millisecondsSinceEpoch
     }).then((value) => print("bikebreadform"));
   }
-   void yourIndiePushSendingFunction() {
+
+  void yourIndiePushSendingFunction() {
     NativeNotify.sendIndieNotification(472, 'qMMR6PMv5Lfht6dCRrmQzA', '4',
         'You have new request', '$names', null, null);
     // yourAppID, yourAppToken, 'your_sub_id', 'your_title', 'your_body' is required
     // put null in any other parameter you do NOT want to use
   }
-
-
-  
 
   DropdownMenuItem<String> buildmenu(String item) => DropdownMenuItem(
       value: item,

@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:carserv/views/bootomnav/home.dart';
 import 'package:carserv/views/register.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -110,26 +111,34 @@ class Loginpage extends StatelessWidget {
 void verificycode(ctx)async {
   PhoneAuthCredential credentiall = PhoneAuthProvider.credential(
       verificationId: Verifi, smsCode: otpInput.text);
- await auth.signInWithCredential(credentiall).then((value) {
+ await auth.signInWithCredential(credentiall).then((value) async{
+      final snapshot = await FirebaseFirestore.instance
+          .collection('Users')
+          .doc(useres!.uid)
+          .get();
+          if (snapshot.exists) {
+            Navigator.pushReplacement(ctx,MaterialPageRoute(builder: (context) => Homescreen(),));
+
+            
+          }else{
+            Navigator.pushReplacement(ctx,MaterialPageRoute(builder: (context) => Registeraion(),));
+          }
   
   
-    Navigator.pushReplacement(
-        ctx,
-        MaterialPageRoute(
-          builder: (context) => Homescreen(),
-        ));
+    // Navigator.pushReplacement(
+    //     ctx,
+    //     MaterialPageRoute(
+    //       builder: (context) => Homescreen(),
+    //     ));
    }).catchError((e){
 
     
-     
-    //  error=e;
-//  error="Invslid";
- 
+  
    
    });
  
 }
-
+final useres=FirebaseAuth.instance.currentUser;
 void veriyingnumber() {
   auth.verifyPhoneNumber(
       phoneNumber: "+91" + userInput.text,
@@ -138,6 +147,7 @@ void veriyingnumber() {
         await auth.signInWithCredential(credential).then((value) {
           print("login");
         });
+       
       },
       verificationFailed: (FirebaseAuthException exoectin) {
         print(exoectin.message);
@@ -151,12 +161,12 @@ void veriyingnumber() {
 
 class Verification extends StatelessWidget {
    Verification({Key? key,}) : super(key: key);
-   Stream<User?> user=FirebaseAuth.instance.authStateChanges();
+  //  Stream<User?> user=FirebaseAuth.instance.authStateChanges();
   
 
   @override
   Widget build(BuildContext context) {
-    print(user);
+    // print(user);
     return SafeArea(
         child: Scaffold(
       backgroundColor: Color(0XFF3D433E),
@@ -206,12 +216,13 @@ class Verification extends StatelessWidget {
                           MaterialStateProperty.all(Color(0XFF62A769))),
                   onPressed: () {
                     verificycode(context);
-                    if (user==null) {
-                       Registeraion();
+                  
+                    // if (user==null) {
+                    //    Registeraion();
                       
-                    }else{
-                      Homescreen();
-                    }
+                    // }else{
+                    //   Homescreen();
+                    // }
                   
                   
                 //  await   Navigator.pushReplacement(

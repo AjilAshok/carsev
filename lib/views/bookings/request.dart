@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 
 Color clr = Colors.white;
 final currenuserid=FirebaseAuth.instance.currentUser!.uid; 
@@ -151,6 +152,8 @@ class Secondpage extends StatelessWidget {
     return StreamBuilder<QuerySnapshot>(
       stream:  FirebaseFirestore.instance.collection('Accepted').where('currentuserid',isEqualTo:currenuserid ).snapshots(),
       builder: (context,AsyncSnapshot<QuerySnapshot> snapshot) {
+
+        
         if (snapshot.connectionState==ConnectionState.waiting) {
           // print(currenuserid);
           return Center(
@@ -158,7 +161,15 @@ class Secondpage extends StatelessWidget {
           );
             
           
-        }if (snapshot.data!.docs.isEmpty) {
+        
+        }
+        if (snapshot.data==null) {
+          return Center(
+            child: Text("daaaa"),
+          );
+          
+        }
+        if (snapshot.data!.docs.isEmpty) {
           return Center(
             child: Text("No one is accepted"),
           );
@@ -176,6 +187,8 @@ class Secondpage extends StatelessWidget {
         itemBuilder: (context, index) {
           final details=snapshot.data!.docs[index];
           print( details.id,);
+          final DateTime dateTime=DateTime.fromMillisecondsSinceEpoch(details['date']);
+          var dates=DateFormat('dd-MM-yyyy').format(dateTime);
 
         
           return Padding(
@@ -188,9 +201,7 @@ class Secondpage extends StatelessWidget {
                     details['works'],
                     style: TextStyle(color: clr, fontSize: 20),
                   ),
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.4,
-                  ),
+                 Spacer(),
                   Container(
                       margin: EdgeInsets.only(top: 10),
                       height: 45,
@@ -217,7 +228,7 @@ class Secondpage extends StatelessWidget {
                 Text(details['shopname'], style: TextStyle(color: clr, fontSize: 20)),
                   Padding(
                     padding: const EdgeInsets.only(top:10 ),
-                    child: Text(details['works'], style: TextStyle(color: clr, fontSize: 20)),
+                    child: Text(dates, style: TextStyle(color: clr, fontSize: 20)),
                   ),
                 Divider(
                   thickness: 1,
@@ -282,9 +293,7 @@ class Thirdpage extends StatelessWidget {
                    shopdetails['ownername'],
                     style: TextStyle(color: clr, fontSize: 20),
                   ),
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.3,
-                  ),
+                 Spacer(),
                   experiedbutton()
                 ]),
                 Text(shopdetails['shopname'], style: TextStyle(color: clr, fontSize: 20)),

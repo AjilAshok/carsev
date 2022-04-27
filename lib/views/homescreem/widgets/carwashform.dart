@@ -178,7 +178,8 @@ class Carwashform extends StatelessWidget {
                       print('press');
                       if (_formKey.currentState!.validate()) {
                         yourIndiePushSendingFunction();
-                        carwashform();
+                       await carwashform();
+                         Navigator.pop(context);
                       }
                     },
                     child: Text(
@@ -209,7 +210,10 @@ class Carwashform extends StatelessWidget {
       // <-- The value you want to retrieve.
       //  print(value);
       print(names);
+     
     }
+    
+
     CollectionReference userwashform =
         FirebaseFirestore.instance.collection("Userform");
     return userwashform.add({
@@ -228,12 +232,13 @@ class Carwashform extends StatelessWidget {
       "currenuserid": currentuserid,
       "latitude":controler.latitude.value,
       "logitude":controler.longitude.value,
-      "date":DateFormat('dd-MM-yyyy').format(DateTime.now())
+      "date":DateTime.now().millisecondsSinceEpoch
     }).then((value) => print("carwashform"));
   }
   void yourIndiePushSendingFunction() {
+     var namess=name.text;
     
-    NativeNotify.sendIndieNotification(472, 'qMMR6PMv5Lfht6dCRrmQzA', '4', 'You have new request', '$name', null, null);
+    NativeNotify.sendIndieNotification(472, 'qMMR6PMv5Lfht6dCRrmQzA', '4', 'You have new request', '$namess', null, null);
     // yourAppID, yourAppToken, 'your_sub_id', 'your_title', 'your_body' is required
     // put null in any other parameter you do NOT want to use
 }

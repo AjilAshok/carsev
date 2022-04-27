@@ -3,6 +3,7 @@ import 'package:carserv/contoller/controler.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:get/get_state_manager/src/simple/get_state.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -17,6 +18,7 @@ class Oilwork extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controler=Get.put(Servicecontroller());
     return SafeArea(
       child: Scaffold(
         body: Column(
@@ -58,24 +60,52 @@ class Oilwork extends StatelessWidget {
                       child: Text('No owners'),
                     );
                   }
+                    List<Map> ownerDetails = [];
+                  List distance = [];
+
+                  for (int i = 0; i < snapshot.data!.docs.length; i++) {
+                   
+                    final doubledistacne = Geolocator.distanceBetween(
+                      controler.latitude.value,
+                      controler.longitude.value,
+                      snapshot.data!.docs[i]['latitude'],
+                      snapshot.data!.docs[i]['longitude'],
+                    );
+
+                    ownerDetails.add({
+                      'distance': doubledistacne.round().toInt() / 1000,
+                      'shopName': snapshot.data!.docs[i]['showname'],
+                      'ownerName': snapshot.data!.docs[i]['ownername'],
+                      'location': snapshot.data!.docs[i]['location'],
+                      'ownerId': snapshot.data!.docs[i].id,
+                    });
+                  }
+
+                  List sortedOwnerList = [
+                    for (var e in ownerDetails)
+                      if (e["distance"] < 15) e
+                  ];
+
+                  print(sortedOwnerList);
 
                   return Expanded(
                     child: ListView.builder(
                       scrollDirection: Axis.vertical,
                       // physics: NeverScrollableScrollPhysics(),
 
-                      itemCount: snapshot.data!.docs.length,
+                      itemCount: sortedOwnerList.length,
                       itemBuilder: (context, index) {
                         final ownerdetails = snapshot.data!.docs[index];
                         //  print( ownerdetails['showname']);
+                        final sortedOwnerMap = sortedOwnerList[index];
 
                         return InkWell(
                           onTap: () {
                             Get.to(Oilform(
-                              userid: ownerdetails.id,
-                              shopname: ownerdetails['showname'],
-                              ownername: ownerdetails['ownername'],
-                              location: ownerdetails['location'],
+                              userid: sortedOwnerMap['ownerId'],
+                              shopname: sortedOwnerMap['shopName'],
+                              ownername: sortedOwnerMap['ownerName'],
+                              location: sortedOwnerMap['location'],
                             ));
                           },
                           child: Column(
@@ -112,10 +142,21 @@ class Oilwork extends StatelessWidget {
                               SizedBox(
                                 height: 10,
                               ),
-                              Text(
-                                ownerdetails['showname'],
-                                style: TextStyle(
-                                    fontSize: 25, fontWeight: FontWeight.bold),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Text(
+                                   sortedOwnerMap['shopName'],
+                                    style: TextStyle(
+                                        fontSize: 25, fontWeight: FontWeight.bold),
+                                  ),
+                                  Text(
+                                    '${sortedOwnerMap['distance'].round()} KM',
+                                    style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w400),
+                                  ),
+                                ],
                               ),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.end,
@@ -542,7 +583,7 @@ class Oilform extends StatelessWidget {
           "Manufacture": oilchangecontrole.valueoil.toString(),
           "model": oilchangecontrole.valueyearoil.toString(),
           "year": oilchangecontrole.valueoil1,
-          "issues": oilchange.text,
+          "issues": oilissues.text,
           "owerid": userid,
           "location": location,
           "shopname": shopname,
@@ -553,7 +594,7 @@ class Oilform extends StatelessWidget {
           "currenuserid": currentuserid,
           "latitude": controller.latitude.value,
           "logitude": controller.longitude.value,
-          "date": DateFormat('dd-MM-yyyy').format(DateTime.now())
+          "date":DateTime.now().millisecondsSinceEpoch
         })
         .then((value) => print("useroilform"))
         .onError((error, stackTrace) => print(error));

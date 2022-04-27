@@ -69,39 +69,15 @@ class Bills extends StatelessWidget {
                         height: 10,
                       ),
                       Text(results['shopname'], style: TextStyle(fontSize: 20)),
-                      // SizedBox(
-                      //   height: 10,
-                      // ),
-                      Row(
-                        children: [
-                          Text(results['paymentoption'],
-                              style: TextStyle(fontSize: 20)),
-                          Spacer(),
-                          //         ElevatedButton(
-                          //             style: ButtonStyle(
-                          //                 shape: MaterialStateProperty.all<
-                          //                         RoundedRectangleBorder>(
-                          //                     RoundedRectangleBorder(
-                          //                   borderRadius: BorderRadius.circular(18.0),
-                          //                   // side: BorderSide(color: Color.fromARGB(255, 3, 3, 3))
-                          //                 )),
-                          //                 backgroundColor: MaterialStateProperty.all(
-                          //                     Color(0XFF62A769))),
-                          //             onPressed:()async{
-                          // //
-
-                          //             },
-                          //             //  createpdf,
-
-                          //             child: Text(
-                          //               "PDF Download",
-                          //               style: TextStyle(color: Colors.black),
-                          //             ))
-                        ],
+                      SizedBox(
+                        height: 10,
                       ),
-                      // SizedBox(
-                      //   height: 10,
-                      // ),
+                      Text(results['paymentoption'],
+                          style: TextStyle(fontSize: 20)),
+                     
+                      SizedBox(
+                        height: 10,
+                      ),
                       Text(results['work'], style: TextStyle(fontSize: 20)),
                       SizedBox(
                         height: 10,
