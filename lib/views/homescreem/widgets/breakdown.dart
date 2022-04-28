@@ -83,7 +83,14 @@ class Breakdown extends StatelessWidget {
                       if (e["distance"] < 15) e
                   ];
 
+
                   print(sortedOwnerList);
+                  if (sortedOwnerList.isEmpty) {
+                    return Center(
+                      child: Text("No Owner"),
+                    );
+                    
+                  }
 
                   return Expanded(
                     child: ListView.builder(

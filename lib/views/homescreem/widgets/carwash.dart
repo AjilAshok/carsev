@@ -92,6 +92,12 @@ class Carwash extends StatelessWidget {
                     for (var e in ownerDetails)
                       if (e["distance"] < 15) e
                   ];
+                  if (sortedOwnerList.isEmpty) {
+                    return Center(
+                      child: Text("No Owner"),
+                    );
+                    
+                  }
 
                   print(sortedOwnerList);
 

@@ -88,6 +88,12 @@ class Breakdownbike extends StatelessWidget {
                   ];
 
                   print(sortedOwnerList);
+                  if (sortedOwnerList.isEmpty) {
+                    return Center(
+                      child: Text("No Owner"),
+                    );
+                    
+                  }
                   return Expanded(
                     child: ListView.builder(
                       scrollDirection: Axis.vertical,
